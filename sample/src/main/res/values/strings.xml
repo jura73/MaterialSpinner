@@ -1,0 +1,150 @@
+<resources>
+    <string name="app_name">Sample</string>
+    <string-array name="list_of_cities_in_Italy">
+        <item>Rome</item>
+        <item>Milan</item>
+        <item>Naples</item>
+        <item>Turin</item>
+        <item>Palermo</item>
+        <item>Genoa</item>
+        <item>Bologna</item>
+        <item>Florence</item>
+        <item>Bari</item>
+        <item>Catania</item>
+        <item>Venice</item>
+        <item>Verona</item>
+        <item>Messina</item>
+        <item>Padua</item>
+        <item>Trieste</item>
+        <item>Taranto</item>
+        <item>Brescia</item>
+        <item>Parma</item>
+        <item>Prato</item>
+        <item>Modena</item>
+        <item>Reggio Calabria</item>
+        <item>Reggio Emilia</item>
+        <item>Perugia</item>
+        <item>Ravenna</item>
+        <item>Livorno</item>
+        <item>Cagliari</item>
+        <item>Foggia</item>
+        <item>Rimini</item>
+        <item>Salerno</item>
+        <item>Ferrara</item>
+        <item>Sassari</item>
+        <item>Latina</item>
+        <item>Giugliano in Campania</item>
+        <item>Monza</item>
+        <item>Syracuse</item>
+        <item>Bergamo</item>
+        <item>Pescara</item>
+        <item>Trento</item>
+        <item>Forlì</item>
+        <item>Vicenza</item>
+        <item>Terni</item>
+        <item>Bolzano</item>
+        <item>Novara</item>
+        <item>Piacenza</item>
+        <item>Ancona</item>
+        <item>Andria</item>
+        <item>Udine</item>
+        <item>Arezzo</item>
+        <item>Cesena</item>
+        <item>Lecce</item>
+        <item>Lecce</item>
+        <item>Pesaro</item>
+        <item>Barletta</item>
+        <item>Alessandria</item>
+        <item>La Spezia</item>
+        <item>Pistoia</item>
+        <item>Pisa</item>
+        <item>Catanzaro</item>
+        <item>Guidonia Montecelio</item>
+        <item>Lucca</item>
+        <item>Brindisi</item>
+        <item>Torre del Greco</item>
+        <item>Treviso</item>
+        <item>Busto Arsizio</item>
+        <item>Como</item>
+        <item>Marsala</item>
+        <item>Grosseto</item>
+        <item>Sesto San Giovanni</item>
+        <item>Pozzuoli</item>
+        <item>Varese</item>
+        <item>Fiumicino</item>
+        <item>Casoria</item>
+        <item>Asti</item>
+        <item>Cinisello Balsamo</item>
+        <item>Caserta</item>
+        <item>Gela</item>
+        <item>Aprilia</item>
+        <item>Ragusa</item>
+        <item>Pavia</item>
+        <item>Cremona</item>
+        <item>Carpi</item>
+        <item>Quartu Sant'Elena</item>
+        <item>Lamezia Terme</item>
+        <item>Altamura</item>
+        <item>Imola</item>
+        <item>L’Aquila</item>
+        <item>Massa</item>
+        <item>Trapani</item>
+        <item>Viterbo</item>
+        <item>Cosenza</item>
+        <item>Potenza</item>
+        <item>Castellammare di Stabia</item>
+        <item>Afragola</item>
+        <item>Vittoria</item>
+        <item>Crotone</item>
+        <item>Pomezia</item>
+        <item>Vigevano</item>
+        <item>Carrara</item>
+        <item>Caltanissetta</item>
+        <item>Viareggio</item>
+        <item>Fano</item>
+        <item>Savona</item>
+        <item>Matera</item>
+        <item>Olbia</item>
+        <item>Legnano</item>
+        <item>Acerra</item>
+        <item>Marano di Napoli</item>
+        <item>Benevento</item>
+        <item>Molfetta</item>
+        <item>Agrigento</item>
+        <item>Faenza</item>
+        <item>Cerignola</item>
+        <item>Moncalieri</item>
+        <item>Foligno</item>
+        <item>Manfredonia</item>
+        <item>Tivoli</item>
+        <item>Cuneo</item>
+        <item>Trani</item>
+        <item>Bisceglie</item>
+        <item>Bitonto</item>
+        <item>Bagheria</item>
+        <item>Anzio</item>
+        <item>Portici</item>
+        <item>Modica</item>
+        <item>Sanremo</item>
+        <item>Avellino</item>
+        <item>Teramo</item>
+        <item>Montesilvano</item>
+        <item>Siena</item>
+        <item>Gallarate</item>
+        <item>Velletri</item>
+        <item>Cava de' Tirreni</item>
+        <item>San Severo</item>
+        <item>Aversa</item>
+        <item>Ercolano</item>
+        <item>Civitavecchia</item>
+        <item>Acireale</item>
+        <item>Mazara del Vallo</item>
+        <item>Rovigo</item>
+        <item>Pordenone</item>
+        <item>Battipaglia</item>
+        <item>Rho</item>
+        <item>Chieti</item>
+        <item>Scafati</item>
+        <item>Scandicci</item>
+    </string-array>
+</resources>
