@@ -1,20 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:orientation="vertical">
+    android:paddingTop="@dimen/activity_vertical_margin">
 
     <com.github.jura73.materialspinner.MaterialSpinner
-        android:id="@+id/spinner"
+        android:id="@+id/materialSpinner1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@array/list_of_cities_in_Italy"
-        android:hint="cities in Italy"/>
+        android:hint="cities in Italy" />
+
+    <com.github.jura73.materialspinner.MaterialSpinner
+        android:id="@+id/materialSpinner2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="cities in Italy" />
+
+    <ProgressBar
+        android:id="@+id/progressSpiner2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/buttonClear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear" />
+
+    <com.github.jura73.materialspinner.MaterialSpinner
+        android:id="@+id/materialSpinner3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="cities in Italy" />
+
+    <com.github.jura73.materialspinner.MaterialSpinner
+        android:id="@+id/materialSpinner4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:hint="Disabled spinner" />
 </LinearLayout>
