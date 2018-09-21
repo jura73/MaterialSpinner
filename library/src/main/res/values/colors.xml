@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#d90035</color>
     <color name="hint_color">#808080</color>
     <color name="md_grey_300">#E0E0E0</color>
+    <color name="window_background">@android:color/white</color>
+    <color name="colorPrimary">#d90035</color>
 </resources>

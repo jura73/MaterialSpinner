@@ -12,19 +12,18 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 
 import java.util.Arrays;
 import java.util.List;
 
 public final class MaterialSpinner<T> extends TextInputLayout implements OnClickListener {
+    public static final int INVALID_POSITION = -1;
     private final TextInputEditText mEditText;
     private boolean isShowChoiceAfterFilling;
     private List<T> mArrayList;
     private T mDefaultItem;
     private OnClickListener mOnLazyLoading;
     private OnItemSelectedListener<T> mOnItemSelectedListener;
-    public static final int INVALID_POSITION = -1;
     private int mSelectedPosition = INVALID_POSITION;
 
     public MaterialSpinner(Context context) {
@@ -145,8 +144,6 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
                 }
             });
             dialog.show();
-            Window window = dialog.getWindow();
-            window.setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         }
     }
 
