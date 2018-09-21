@@ -1,99 +1,139 @@
 package com.github.jura73.materialspinner;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListDialog<T> extends AlertDialog {
+class ListDialog<T> extends Dialog {
     private final List<T> mItemsList;
 
     private final MaterialSpinner.OnItemSelectedListener<T> mSelectedListener;
-    private AutocompleteSuggestionsAdapter mSuggestionsAdapter;
+    private SearchView mSearchView;
+    private ListDialogAdapter mSuggestionsAdapter;
 
-    public ListDialog(@NonNull Context context, List<T> list, final MaterialSpinner.OnItemSelectedListener<T> selectedListener) {
-        super(context);
+    ListDialog(@NonNull Context context, List<T> list, final MaterialSpinner.OnItemSelectedListener<T> selectedListener) {
+        super(context, R.style.Dialog);
         mItemsList = list;
         mSelectedListener = selectedListener;
-        setView(createView(context));
+        setContentView(createView(context));
     }
 
     private View createView(Context context) {
         LayoutInflater inflater = LayoutInflater.from(context);
         //no root to pass here
         View view = inflater.inflate(R.layout.dialog_list, null);
+        setupToolbar(view);
         RecyclerView rvAutocompleteSuggestions = view.findViewById(R.id.rvAutocompleteSuggestions);
-        EditText edtTxtFilter = view.findViewById(R.id.etFilter);
         rvAutocompleteSuggestions.setLayoutManager(new LinearLayoutManager(context));
-        mSuggestionsAdapter = new AutocompleteSuggestionsAdapter(mItemsList);
+        mSuggestionsAdapter = new ListDialogAdapter(mItemsList);
         rvAutocompleteSuggestions.setAdapter(mSuggestionsAdapter);
-        edtTxtFilter.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+        rvAutocompleteSuggestions.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                List<T> filteredList = getFilteredList(mItemsList, charSequence.toString());
-                mSuggestionsAdapter.assignNewDataSource(filteredList);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
+            public boolean onTouch(View v, MotionEvent event) {
+                mSearchView.clearFocus();
+                return false;
             }
         });
         return view;
     }
 
-    private List<T> getFilteredList(List<T> initialList, String filterQuery) {
-        ArrayList<T> filteredList = new ArrayList<>();
-        for (T initialListItem : initialList) {
-            if (initialListItem.toString().toLowerCase().contains(filterQuery.toLowerCase())) {
-                filteredList.add(initialListItem);
+    private void setupToolbar(View view) {
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar.inflateMenu(R.menu.menu_main);
+        toolbar.setTitle(R.string.action_search);
+        toolbar.setNavigationIcon(getContext().getResources().getDrawable(R.drawable.ic_arrow_back_white_24dp));
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
             }
-        }
-        return filteredList;
+        });
+
+        mSearchView = (SearchView) toolbar.getMenu().findItem(R.id.action_search)
+                .getActionView();
+        mSearchView.setMaxWidth(Integer.MAX_VALUE);
+        mSearchView.setQueryHint(getContext().getString(R.string.action_search));
+        // expands SearchView
+        mSearchView.setIconified(false);
+        // not closes the SearchView
+        mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                return true;
+            }
+        });
+        // listening to search query text change
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mSuggestionsAdapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                mSuggestionsAdapter.getFilter().filter(query);
+                return false;
+            }
+        });
     }
 
-    class AutocompleteSuggestionsAdapter extends RecyclerView.Adapter<ViewHolderSuggestion>
-            implements View.OnClickListener {
+    class ListDialogAdapter extends RecyclerView.Adapter<ListDialogAdapter.ViewHolderItem>
+            implements Filterable {
 
         private List<T> mAdapterItems;
+        Filter mFilter = new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                ArrayList<T> filteredList = new ArrayList<>();
+                for (T initialListItem : mItemsList) {
+                    if (initialListItem.toString().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                        filteredList.add(initialListItem);
+                    }
+                }
 
-        private AutocompleteSuggestionsAdapter(List<T> adapterItems) {
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = filteredList;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                mAdapterItems = (List<T>) results.values;
+                notifyDataSetChanged();
+            }
+        };
+
+        private ListDialogAdapter(List<T> adapterItems) {
             mAdapterItems = adapterItems;
-        }
-
-        private void assignNewDataSource(List<T> newItemsList) {
-            mAdapterItems = newItemsList;
-            notifyDataSetChanged();
         }
 
         @NonNull
         @Override
-        public ViewHolderSuggestion onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-            return new ViewHolderSuggestion(
-                    layoutInflater.inflate(R.layout.item_autocomplete_list_activity_suggestion, parent, false));
+        public ViewHolderItem onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_list, parent, false);
+            return new ViewHolderItem(itemView);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ViewHolderSuggestion holder, int position) {
+        public void onBindViewHolder(@NonNull ViewHolderItem holder, int position) {
             holder.mTxtVwItemName.setText(mAdapterItems.get(position).toString());
-            holder.mTxtVwItemName.setTag(holder);
-            holder.mTxtVwItemName.setOnClickListener(this);
-
         }
 
         @Override
@@ -102,21 +142,29 @@ public class ListDialog<T> extends AlertDialog {
         }
 
         @Override
-        public void onClick(View view) {
-            RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder) view.getTag();
-            int selectedAdapterPosition = mAdapterItems.indexOf(mAdapterItems.get(holder.getAdapterPosition()));
-            mSelectedListener.onItemSelected(mAdapterItems.get(holder.getAdapterPosition()), view, selectedAdapterPosition);
-            ListDialog.this.dismiss();
+        public Filter getFilter() {
+            return mFilter;
         }
-    }
 
-    class ViewHolderSuggestion extends RecyclerView.ViewHolder {
+        class ViewHolderItem extends RecyclerView.ViewHolder {
 
-        private final TextView mTxtVwItemName;
+            private final TextView mTxtVwItemName;
 
-        ViewHolderSuggestion(View itemView) {
-            super(itemView);
-            mTxtVwItemName = (TextView) itemView;
+            ViewHolderItem(View itemView) {
+                super(itemView);
+                mTxtVwItemName = (TextView) itemView;
+
+
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        T itemSelected = mAdapterItems.get(getAdapterPosition());
+                        int selectedPosition = mItemsList.indexOf(itemSelected);
+                        mSelectedListener.onItemSelected(itemSelected, v, selectedPosition);
+                        ListDialog.this.dismiss();
+                    }
+                });
+            }
         }
     }
 }
