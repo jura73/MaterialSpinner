@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.AdapterView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +24,8 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
     private T mDefaultItem;
     private OnClickListener mOnLazyLoading;
     private OnItemSelectedListener<T> mOnItemSelectedListener;
-    private int mSelectedPosition = AdapterView.INVALID_POSITION;
+    public static final int INVALID_POSITION = -1;
+    private int mSelectedPosition = INVALID_POSITION;
 
     public MaterialSpinner(Context context) {
         this(context, null);
@@ -46,6 +46,12 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
                 MaterialSpinner.this.onClick(v);
             }
         }));
+        post(new Runnable() {
+            @Override
+            public void run() {
+                restorePosition();
+            }
+        });
         mTextInputLayout.setHint(this.getHint());
         TypedArray typedArrayMaterialSpinner = getContext().obtainStyledAttributes(attrs, R.styleable.MaterialSpinner);
         mTextInputLayout.setEnabled(typedArrayMaterialSpinner.getBoolean(0, true));
@@ -72,7 +78,7 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
     }
 
     public final void restorePosition() {
-        if(mSelectedPosition != AdapterView.INVALID_POSITION){
+        if (mSelectedPosition != INVALID_POSITION) {
             setSelectionPosition(mSelectedPosition);
         }
     }
@@ -146,29 +152,27 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
 
     @Override
     public Parcelable onSaveInstanceState() {
-        Parcelable superState = super.onSaveInstanceState();
-        SavedState ss = new SavedState(superState);
+        super.onSaveInstanceState();
+        SavedState ss = new SavedState();
         ss.stateToSave = mSelectedPosition;
         return ss;
     }
 
     @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        //begin boilerplate code so parent classes can restore state
-        if (!(state instanceof SavedState)) {
-            super.onRestoreInstanceState(state);
-            return;
+    protected void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof SavedState) {
+            SavedState ss = (SavedState) state;
+            super.onRestoreInstanceState(null);
+            mSelectedPosition = ss.stateToSave;
         }
-        SavedState ss = (SavedState) state;
-        super.onRestoreInstanceState(ss.getSuperState());
-        mSelectedPosition = ss.stateToSave;
+        super.onRestoreInstanceState(null);
     }
 
     public interface OnItemSelectedListener<T> {
         void onItemSelected(T item, @NonNull View view, int position);
     }
 
-    static class SavedState extends BaseSavedState {
+    static class SavedState implements Parcelable {
         public static final Parcelable.Creator<SavedState> CREATOR =
                 new Parcelable.Creator<SavedState>() {
                     public SavedState createFromParcel(Parcel in) {
@@ -181,19 +185,21 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
                 };
         int stateToSave;
 
-        SavedState(Parcelable superState) {
-            super(superState);
+        SavedState() {
         }
 
         private SavedState(Parcel in) {
-            super(in);
-            this.stateToSave = in.readInt();
+            stateToSave = in.readInt();
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
         }
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
-            super.writeToParcel(out, flags);
-            out.writeInt(this.stateToSave);
+            out.writeInt(stateToSave);
         }
     }
 }

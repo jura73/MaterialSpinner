@@ -18,5 +18,6 @@
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:minHeight="24dp"
+        android:saveEnabled="false"
         android:textIsSelectable="false" />
 </android.support.design.widget.TextInputLayout>
