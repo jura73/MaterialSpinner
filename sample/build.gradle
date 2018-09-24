@@ -23,6 +23,6 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     testImplementation 'junit:junit:4.12'
-  //  compile 'com.github.jura73.materialspinner'
-    implementation project(':library')
+    implementation 'com.github.jura73:MaterialSpinner:0.8.1'
+   // implementation project(':library')
 }
