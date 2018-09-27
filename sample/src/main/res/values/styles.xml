@@ -7,4 +7,15 @@
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
 
+    <style name="MaterialSpinnerOverrideStyle">
+        <!-- Customize your theme here. -->
+        <item name="android:theme">@style/Theme</item>
+    </style>
+
+    <style name="Theme">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#0f0</item>
+        <item name="colorPrimaryDark">#0f0</item>
+        <item name="colorAccent">#0f0</item>
+    </style>
 </resources>

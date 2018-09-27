@@ -3,5 +3,7 @@
     <declare-styleable name="MaterialSpinner">
         <attr name="android:enabled"/>
         <attr name="android:entries"/>
+        <attr name="android:textColor"/>
+        <attr name="android:colorAccent"/>
     </declare-styleable>
 </resources>

@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                         materialSpinner2.setList(list_of_cities);
                         progressBar.setVisibility(View.GONE);
                     }
-                }, 3000);
+                }, 2000);
             }
         });
 

@@ -1,6 +1,7 @@
 package com.github.jura73.materialspinner;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,8 +9,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -36,24 +37,32 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
 
     public MaterialSpinner(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        LayoutInflater inflater = LayoutInflater.from(context);
-        inflater.inflate(R.layout.material_loading, this, true);
-        TextInputLayout mTextInputLayout = findViewById(R.id.textInputLayout);
-        mEditText = this.findViewById(R.id.edtTxtSpinner);
+        inflate(context, R.layout.material_loading, this);
+        mEditText = findViewById(R.id.edtTxtSpinner);
         mEditText.setOnClickListener((new OnClickListener() {
             public final void onClick(View v) {
                 MaterialSpinner.this.onClick(v);
             }
         }));
+
         post(new Runnable() {
             @Override
             public void run() {
                 restorePosition();
             }
         });
-        mTextInputLayout.setHint(this.getHint());
-        TypedArray typedArrayMaterialSpinner = getContext().obtainStyledAttributes(attrs, R.styleable.MaterialSpinner);
-        mTextInputLayout.setEnabled(typedArrayMaterialSpinner.getBoolean(0, true));
+        TypedArray typedArrayMaterialSpinner = context.obtainStyledAttributes(attrs, R.styleable.MaterialSpinner);
+        setEnabled(typedArrayMaterialSpinner.getBoolean(R.styleable.MaterialSpinner_android_enabled, true));
+        ColorStateList colors = typedArrayMaterialSpinner.getColorStateList(R.styleable.MaterialSpinner_android_textColor);
+        if (colors != null) {
+            mEditText.setTextColor(colors);
+        }
+
+        ColorStateList colorsTint = typedArrayMaterialSpinner.getColorStateList(R.styleable.MaterialSpinner_android_colorAccent);
+        if (colorsTint != null && isEnabled()) { // if disabled color is Accent
+            ViewCompat.setBackgroundTintList(mEditText, colorsTint);
+        }
+
         typedArrayMaterialSpinner.recycle();
 
         TypedArray typedArraySpinner = getContext().obtainStyledAttributes(attrs, android.support.design.R.styleable.Spinner);
