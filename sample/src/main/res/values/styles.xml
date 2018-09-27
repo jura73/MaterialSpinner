@@ -14,8 +14,6 @@
 
     <style name="Theme">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">#0f0</item>
-        <item name="colorPrimaryDark">#0f0</item>
         <item name="colorAccent">#0f0</item>
     </style>
 </resources>

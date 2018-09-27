@@ -19,7 +19,9 @@ import java.util.List;
 
 public final class MaterialSpinner<T> extends TextInputLayout implements OnClickListener {
     public static final int INVALID_POSITION = -1;
+    public static final int ALPHA = 85;
     private final TextInputEditText mEditText;
+    private final ColorStateList mColorsTint;
     private boolean isShowChoiceAfterFilling;
     private List<T> mArrayList;
     private T mDefaultItem;
@@ -52,17 +54,15 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
             }
         });
         TypedArray typedArrayMaterialSpinner = context.obtainStyledAttributes(attrs, R.styleable.MaterialSpinner);
-        setEnabled(typedArrayMaterialSpinner.getBoolean(R.styleable.MaterialSpinner_android_enabled, true));
+
         ColorStateList colors = typedArrayMaterialSpinner.getColorStateList(R.styleable.MaterialSpinner_android_textColor);
         if (colors != null) {
             mEditText.setTextColor(colors);
         }
 
-        ColorStateList colorsTint = typedArrayMaterialSpinner.getColorStateList(R.styleable.MaterialSpinner_android_colorAccent);
-        if (colorsTint != null && isEnabled()) { // if disabled color is Accent
-            ViewCompat.setBackgroundTintList(mEditText, colorsTint);
-        }
+        mColorsTint = typedArrayMaterialSpinner.getColorStateList(R.styleable.MaterialSpinner_android_colorAccent);
 
+        setEnabled(typedArrayMaterialSpinner.getBoolean(R.styleable.MaterialSpinner_android_enabled, true));
         typedArrayMaterialSpinner.recycle();
 
         TypedArray typedArraySpinner = getContext().obtainStyledAttributes(attrs, android.support.design.R.styleable.Spinner);
@@ -72,6 +72,22 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
             mArrayList = (List<T>) Arrays.asList(res);
         }
         typedArraySpinner.recycle();
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        setTintColor(enabled);
+        super.setEnabled(enabled);
+    }
+
+    private void setTintColor(boolean enabled) {
+        if (mColorsTint != null) {
+            if (enabled) {
+                ViewCompat.setBackgroundTintList(mEditText, mColorsTint);
+            } else {
+                ViewCompat.setBackgroundTintList(mEditText, mColorsTint.withAlpha(ALPHA));
+            }
+        }
     }
 
     public final void setList(@NonNull List<T> arrayList) {
