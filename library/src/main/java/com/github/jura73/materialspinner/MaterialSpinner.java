@@ -7,12 +7,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.EditText;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.List;
 public final class MaterialSpinner<T> extends TextInputLayout implements OnClickListener {
     public static final int INVALID_POSITION = -1;
     public static final int ALPHA = 85;
-    private final TextInputEditText mEditText;
+    private final EditText mEditText;
     private final ColorStateList mColorsTint;
     private boolean isShowChoiceAfterFilling;
     private List<T> mArrayList;
@@ -60,7 +60,7 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
             mEditText.setTextColor(colors);
         }
 
-        mColorsTint = typedArrayMaterialSpinner.getColorStateList(R.styleable.MaterialSpinner_android_colorAccent);
+        mColorsTint = typedArrayMaterialSpinner.getColorStateList(R.styleable.MaterialSpinner_colorAccent);
 
         setEnabled(typedArrayMaterialSpinner.getBoolean(R.styleable.MaterialSpinner_android_enabled, true));
         typedArrayMaterialSpinner.recycle();
@@ -90,15 +90,26 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
         }
     }
 
-    public final void setList(@NonNull List<T> arrayList) {
+    public final void setList(@Nullable List<T> arrayList) {
         mArrayList = arrayList;
-        if (mArrayList.size() == 1) {
-            this.setSelectionPosition(0);
-        } else if (this.isShowChoiceAfterFilling) {
+        if (this.isShowChoiceAfterFilling) {
             this.showSpinnerListDialog();
             this.isShowChoiceAfterFilling = false;
         }
         restorePosition();
+    }
+
+    public final void setListWithAutoSelect(@Nullable List<T> arrayList) {
+        mArrayList = arrayList;
+        if (arrayList != null) {
+            if (mArrayList.size() == 1) {
+                this.setSelectionPosition(0);
+            } else if (this.isShowChoiceAfterFilling) {
+                this.showSpinnerListDialog();
+                this.isShowChoiceAfterFilling = false;
+            }
+            restorePosition();
+        }
     }
 
     public final void restorePosition() {
@@ -117,9 +128,13 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
         this.mSelectedPosition = -1;
     }
 
-    public final void setDefaultItem(T item) {
-        this.mDefaultItem = item;
-        this.mEditText.setText(String.valueOf(item));
+    public final void setDefaultItem(@Nullable T item) {
+        mDefaultItem = item;
+        if (item != null) {
+            mEditText.setText(String.valueOf(item));
+        } else {
+            mEditText.setText("");
+        }
     }
 
     public final void setLazyLoading(@Nullable OnClickListener onClickListener) {
@@ -134,8 +149,9 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
         }
     }
 
+    @Nullable
     public T getSelectedItem() {
-        if (mArrayList != null && mArrayList.size() > 0 && mSelectedPosition >= 0) {
+        if (mArrayList != null && mArrayList.size() > mSelectedPosition && mSelectedPosition >= 0) {
             return mArrayList.get(mSelectedPosition);
         }
         return mDefaultItem;
@@ -161,11 +177,12 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
         if (mArrayList != null) {
             ListDialog<T> dialog = new ListDialog<>(getContext(), mArrayList, new OnItemSelectedListener<T>() {
                 @Override
-                public void onItemSelected(T item, @NonNull View view, int position) {
+                public void onItemSelected(@NonNull T item, @NonNull View view, int position) {
                     MaterialSpinner.this.setSelectionPosition(position);
                     if (mOnItemSelectedListener != null) {
                         mOnItemSelectedListener.onItemSelected(item, MaterialSpinner.this, position);
                     }
+
                 }
             });
             dialog.show();
@@ -191,7 +208,7 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
     }
 
     public interface OnItemSelectedListener<T> {
-        void onItemSelected(T item, @NonNull View view, int position);
+        void onItemSelected(@NonNull T item, @NonNull View view, int position);
     }
 
     static class SavedState implements Parcelable {

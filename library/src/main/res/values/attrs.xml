@@ -4,6 +4,6 @@
         <attr name="android:enabled"/>
         <attr name="android:entries"/>
         <attr name="android:textColor"/>
-        <attr name="android:colorAccent"/>
+        <attr name="colorAccent" format="color"/>
     </declare-styleable>
 </resources>
