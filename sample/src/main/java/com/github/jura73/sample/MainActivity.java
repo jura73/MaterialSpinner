@@ -2,6 +2,7 @@ package com.github.jura73.sample;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -27,12 +28,10 @@ public class MainActivity extends AppCompatActivity {
         String[] stringArray = getResources().getStringArray(R.array.list_of_cities_in_Italy);
         list_of_cities = Arrays.asList(stringArray);
 
-        progressBar = findViewById(R.id.progressSpiner2);
-
         materialSpinner1 = findViewById(R.id.materialSpinner1);
-        materialSpinner2 = findViewById(R.id.materialSpinner2);
-        materialSpinner2.setDefaultItem("Milan");
 
+        materialSpinner2 = findViewById(R.id.materialSpinner2);
+        progressBar = findViewById(R.id.progressSpiner2);
         materialSpinner2.setLazyLoading(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -42,8 +41,16 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         materialSpinner2.setList(list_of_cities);
                         progressBar.setVisibility(View.GONE);
+
                     }
-                }, 2000);
+                }, 1000);
+            }
+        });
+
+        materialSpinner2.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+            @Override
+            public void onItemSelected(@NonNull String item, @NonNull View view, int position) {
+                materialSpinner2.setEnabled(false);
             }
         });
 
@@ -52,10 +59,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 materialSpinner2.clear();
+                materialSpinner2.setEnabled(true);
             }
         });
 
         materialSpinner3 = findViewById(R.id.materialSpinner3);
         materialSpinner3.setList(list_of_cities);
+        materialSpinner3.setDefaultItem("Milan");
     }
 }

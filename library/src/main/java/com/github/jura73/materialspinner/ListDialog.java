@@ -18,7 +18,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-class ListDialog<T> extends Dialog {
+public class ListDialog<T> extends Dialog {
     private final List<T> mItemsList;
 
     private final MaterialSpinner.OnItemSelectedListener<T> mSelectedListener;

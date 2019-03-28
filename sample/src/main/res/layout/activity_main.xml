@@ -15,9 +15,8 @@
         android:layout_height="wrap_content"
         android:entries="@array/list_of_cities_in_Italy"
         android:hint="cities in Italy"
-        style="@style/MaterialSpinnerOverrideStyle"
-
         app:passwordToggleDrawable="@android:drawable/arrow_up_float" />
+
 
     <com.github.jura73.materialspinner.MaterialSpinner
         android:id="@+id/materialSpinner2"

@@ -8,7 +8,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,7 +20,6 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
     public static final int INVALID_POSITION = -1;
     public static final int ALPHA = 85;
     private final EditText mEditText;
-    private final ColorStateList mColorsTint;
     private boolean isShowChoiceAfterFilling;
     private List<T> mArrayList;
     private T mDefaultItem;
@@ -60,8 +58,6 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
             mEditText.setTextColor(colors);
         }
 
-        mColorsTint = typedArrayMaterialSpinner.getColorStateList(R.styleable.MaterialSpinner_colorAccent);
-
         setEnabled(typedArrayMaterialSpinner.getBoolean(R.styleable.MaterialSpinner_android_enabled, true));
         typedArrayMaterialSpinner.recycle();
 
@@ -72,22 +68,6 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
             mArrayList = (List<T>) Arrays.asList(res);
         }
         typedArraySpinner.recycle();
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        setTintColor(enabled);
-        super.setEnabled(enabled);
-    }
-
-    private void setTintColor(boolean enabled) {
-        if (mColorsTint != null) {
-            if (enabled) {
-                ViewCompat.setBackgroundTintList(mEditText, mColorsTint);
-            } else {
-                ViewCompat.setBackgroundTintList(mEditText, mColorsTint.withAlpha(ALPHA));
-            }
-        }
     }
 
     public final void setList(@Nullable List<T> arrayList) {
