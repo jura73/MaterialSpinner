@@ -70,6 +70,7 @@ public final class ListDialog<T> extends Dialog {
         mSearchView.setQueryHint(getContext().getString(R.string.action_search));
         // expands SearchView
         mSearchView.setIconified(false);
+        mSearchView.clearFocus();
         // not closes the SearchView
         mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
@@ -153,7 +154,6 @@ public final class ListDialog<T> extends Dialog {
             ViewHolderItem(View itemView) {
                 super(itemView);
                 mTxtVwItemName = (TextView) itemView;
-
 
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
