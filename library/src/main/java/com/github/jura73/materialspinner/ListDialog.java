@@ -25,7 +25,7 @@ public final class ListDialog<T> extends Dialog {
     private SearchView mSearchView;
     private ListDialogAdapter mSuggestionsAdapter;
 
-    ListDialog(@NonNull Context context, List<T> list, final MaterialSpinner.OnItemSelectedListener<T> selectedListener) {
+    public ListDialog(@NonNull Context context, List<T> list, final MaterialSpinner.OnItemSelectedListener<T> selectedListener) {
         super(context, R.style.Dialog);
         mItemsList = list;
         mSelectedListener = selectedListener;
