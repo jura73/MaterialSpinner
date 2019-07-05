@@ -23,7 +23,7 @@
         android:ellipsize="marquee"
         android:entries="@array/list_of_cities_in_Italy"
         app:lsw_label="Производитель"
-        android:background="@color/colorPrimary" />
+  />
 
     <TextView
         android:layout_width="match_parent"

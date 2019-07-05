@@ -40,15 +40,25 @@ public final class ListSelectorView<T> extends View {
     @Nullable
     String valueText;
     Drawable mDrawable;
-
+    
     public ListSelectorView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        //  this(context, attrs, R.attr.listSelectorWidgetStyle);//R.attr.listSelectorStyle
-        this(context, attrs, 0);//R.attr.listSelectorStyle
+        this(context, attrs, 0);
     }
 
     public void setText(String text) {
         valueText = text;
         invalidate();
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        if (enabled == isEnabled()) return;
+        if (enabled) {
+            setAlpha(1f);
+        } else {
+            setAlpha(0.2f);
+        }
+        super.setEnabled(enabled);
     }
 
     @Override
@@ -124,7 +134,7 @@ public final class ListSelectorView<T> extends View {
 //           // setTextColor(colors);
 //        }
 //
-//        setEnabled(typedArrayMaterialSpinner.getBoolean(R.styleable.MaterialSpinner_android_enabled, true));
+        setEnabled(typedArrayListSelectorView.getBoolean(R.styleable.MaterialSpinner_android_enabled, true));
 //        typedArrayMaterialSpinner.recycle();
 //
 //        TypedArray typedArraySpinner = getContext().obtainStyledAttributes(attrs, android.support.design.R.styleable.Spinner);
