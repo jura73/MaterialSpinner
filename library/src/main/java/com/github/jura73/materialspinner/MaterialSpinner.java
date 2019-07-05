@@ -187,10 +187,6 @@ public final class MaterialSpinner<T> extends TextInputLayout implements OnClick
         super.onRestoreInstanceState(null);
     }
 
-    public interface OnItemSelectedListener<T> {
-        void onItemSelected(@NonNull T item, @NonNull View view, int position);
-    }
-
     static class SavedState implements Parcelable {
         public static final Parcelable.Creator<SavedState> CREATOR =
                 new Parcelable.Creator<SavedState>() {

@@ -4,16 +4,23 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.AppCompatButton;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import com.github.jura73.materialspinner.ListSelectorWidget;
 import com.github.jura73.materialspinner.MaterialSpinner;
+import com.github.jura73.materialspinner.OnItemSelectedListener;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    ListSelectorWidget<String> listSelector1;
 
     MaterialSpinner<String> materialSpinner1;
     MaterialSpinner<String> materialSpinner2;
@@ -27,6 +34,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         String[] stringArray = getResources().getStringArray(R.array.list_of_cities_in_Italy);
         list_of_cities = Arrays.asList(stringArray);
+
+        listSelector1 = findViewById(R.id.listSelector1);
+        listSelector1.setList(list_of_cities);
+        ListSelectorWidget<String>  listSelector2 = findViewById(R.id.listSelector2);
+        listSelector2.setList(list_of_cities);
 
         materialSpinner1 = findViewById(R.id.materialSpinner1);
 
@@ -47,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        materialSpinner2.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+        materialSpinner2.setOnItemSelectedListener(new OnItemSelectedListener<String>() {
             @Override
             public void onItemSelected(@NonNull String item, @NonNull View view, int position) {
                 materialSpinner2.setEnabled(false);

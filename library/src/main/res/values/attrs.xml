@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <attr name="listSelectorWidgetStyle" format="reference" />
+
     <declare-styleable name="MaterialSpinner">
-        <attr name="android:enabled"/>
-        <attr name="android:entries"/>
-        <attr name="android:textColor"/>
-        <attr name="colorAccent" format="color"/>
+        <attr name="android:enabled" />
+        <attr name="android:entries" />
+        <attr name="android:textColor" />
+        <attr name="colorAccent" format="color" />
     </declare-styleable>
 </resources>

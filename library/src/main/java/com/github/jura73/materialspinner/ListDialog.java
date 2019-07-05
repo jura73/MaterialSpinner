@@ -21,11 +21,11 @@ import java.util.List;
 public final class ListDialog<T> extends Dialog {
     private final List<T> mItemsList;
 
-    private final MaterialSpinner.OnItemSelectedListener<T> mSelectedListener;
+    private final OnItemSelectedListener<T> mSelectedListener;
     private SearchView mSearchView;
     private ListDialogAdapter mSuggestionsAdapter;
 
-    public ListDialog(@NonNull Context context, List<T> list, final MaterialSpinner.OnItemSelectedListener<T> selectedListener) {
+    public ListDialog(@NonNull Context context, List<T> list, final OnItemSelectedListener<T> selectedListener) {
         super(context, R.style.Dialog);
         mItemsList = list;
         mSelectedListener = selectedListener;

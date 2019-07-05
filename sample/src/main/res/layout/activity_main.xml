@@ -9,6 +9,37 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin">
 
+    <com.github.jura73.materialspinner.ListSelectorWidget
+        android:id="@+id/listSelector1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:entries="@array/list_of_cities_in_Italy"
+        android:hint="cities in Italy"
+        android:paddingLeft="24dp"
+        android:singleLine="true" />
+
+    <com.github.jura73.materialspinner.ListSelectorWidget
+        android:id="@+id/listSelector2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:entries="@array/list_of_cities_in_Italy"
+        android:hint="cities in Italy"
+        android:singleLine="true"
+        android:paddingLeft="24dp"
+        android:background="@color/md_grey_400"
+        android:textSize="24sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="24dp"
+        android:textSize="24sp"
+        android:background="@color/colorPrimary"
+        android:text="Italy Naples"/>
+
+
     <com.github.jura73.materialspinner.MaterialSpinner
         android:id="@+id/materialSpinner1"
         android:layout_width="match_parent"
