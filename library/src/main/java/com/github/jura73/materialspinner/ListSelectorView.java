@@ -32,7 +32,7 @@ public final class ListSelectorView<T> extends View {
         this(context, null);
     }
 
-    int space = 10;
+    int spaceSize;
     TextPaint labelTextPaint;
     TextPaint valueTextPaint;
     @Nullable
@@ -43,7 +43,7 @@ public final class ListSelectorView<T> extends View {
 
     public ListSelectorView(@NonNull Context context, @Nullable AttributeSet attrs) {
         //  this(context, attrs, R.attr.listSelectorWidgetStyle);//R.attr.listSelectorStyle
-        this(context, attrs, R.style.ListSelectorWidget);//R.attr.listSelectorStyle
+        this(context, attrs, 0);//R.attr.listSelectorStyle
     }
 
     public void setText(String text) {
@@ -67,8 +67,8 @@ public final class ListSelectorView<T> extends View {
         // Draw Label
         drawText(canvas, textLabel, availableWidth, labelTextPaint, false);
         int widthValueText = Math.round(labelTextPaint.measureText(textLabel));
-        canvas.translate(widthValueText, 0);
-        availableWidth -= widthValueText;
+        canvas.translate(widthValueText + spaceSize, 0);
+        availableWidth -= widthValueText + spaceSize;
         // Draw Value
 
         drawText(canvas, valueText, availableWidth, valueTextPaint, true);
@@ -117,6 +117,7 @@ public final class ListSelectorView<T> extends View {
         labelTextPaint.setTextSize(textSize);
         valueTextPaint.setTextSize(textSize);
         valueTextPaint.setAlpha(ALPHA);
+        spaceSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_lsw_spaceSize, scaledSizeInPixels / 2);
 
 //        ColorStateList colors = typedArrayMaterialSpinner.getColorStateList(R.styleable.MaterialSpinner_android_textColor);
 //        if (colors != null) {

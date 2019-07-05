@@ -13,6 +13,7 @@
         <attr name="android:drawableEnd"/>
         <attr name="lsw_label" format="string"/>
         <attr name="lsw_value" format="string"/>
+        <attr name="lsw_spaceSize" format="dimension"/>
     </declare-styleable>
 
     <declare-styleable name="MaterialSpinner">

@@ -13,7 +13,6 @@
         android:id="@+id/listSelector1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ellipsize="marquee"
         android:entries="@array/list_of_cities_in_Italy"
         app:lsw_label="Производитель" />
 
@@ -24,9 +23,9 @@
         android:ellipsize="marquee"
         android:entries="@array/list_of_cities_in_Italy"
         app:lsw_label="Производитель"
-        android:singleLine="true"
         android:paddingLeft="24dp"
-        android:background="@color/md_grey_400"
+        android:paddingRight="24dp"
+        android:background="@color/colorPrimary"
         android:textSize="24sp" />
 
     <TextView
@@ -47,6 +46,7 @@
         android:layout_height="wrap_content"
         android:entries="@array/list_of_cities_in_Italy"
         android:hint="cities in Italy"
+        android:background="@color/md_grey_400"
         app:passwordToggleDrawable="@android:drawable/arrow_up_float" />
 
 
