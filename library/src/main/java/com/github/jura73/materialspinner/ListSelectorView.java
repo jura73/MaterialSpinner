@@ -54,9 +54,9 @@ public final class ListSelectorView<T> extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         int availableWidth = getWidth() - getPaddingRight() - getPaddingLeft();
-        canvas.translate(getPaddingLeft(), 0);
+        canvas.translate(getPaddingLeft(), getPaddingTop());
 
-        final int height = getHeight();
+        final int height = getHeight() - getPaddingTop() - getPaddingBottom();
         int topDrawable = (height - mDrawable.getIntrinsicHeight()) / 2;
 
         mDrawable.setBounds(availableWidth - mDrawable.getIntrinsicWidth(), topDrawable, availableWidth, topDrawable + mDrawable.getIntrinsicHeight());
@@ -268,7 +268,7 @@ public final class ListSelectorView<T> extends View {
 
         if (heightMode != MeasureSpec.EXACTLY) {
             // Parent has told us how big to be. So be it.
-            height = Math.round(labelTextPaint.getTextSize() + labelTextPaint.getFontMetrics().bottom * getResources().getDisplayMetrics().density);// 12 TODO текс ровно посередине но не так как в TextView
+            height = Math.round(labelTextPaint.getTextSize() + labelTextPaint.getFontMetrics().bottom * getResources().getDisplayMetrics().density) + getPaddingTop() + getPaddingBottom();
             if (heightMode == MeasureSpec.AT_MOST) {
                 height = Math.min(height, heightSize);
             }
