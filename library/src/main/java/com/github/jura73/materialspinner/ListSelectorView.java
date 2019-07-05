@@ -65,34 +65,37 @@ public final class ListSelectorView<T> extends View {
         availableWidth -= mDrawable.getIntrinsicWidth();
 
         // Draw Label
-        int dx = drawText(canvas, textLabel, availableWidth, labelTextPaint);
-        canvas.translate(dx, 0);
-        availableWidth -= dx;
+        drawText(canvas, textLabel, availableWidth, labelTextPaint, false);
+        int widthValueText = Math.round(labelTextPaint.measureText(textLabel));
+        canvas.translate(widthValueText, 0);
+        availableWidth -= widthValueText;
         // Draw Value
-        drawText(canvas, valueText, availableWidth, valueTextPaint);
+
+        drawText(canvas, valueText, availableWidth, valueTextPaint, true);
     }
 
-    protected int drawText(Canvas canvas, String text, int availableWidth,  TextPaint  textPaint) {
+    protected void drawText(Canvas canvas, String text, int availableWidth, TextPaint textPaint, boolean textToRight) {
         if (text != null && availableWidth > 0) {
             int yPos = -Math.round(textPaint.getFontMetrics().top);
             int widthValueText = Math.round(textPaint.measureText(text));
             if (widthValueText > availableWidth) {
                 CharSequence ellipsizeValueText = TextUtils.ellipsize(text, textPaint, availableWidth, TextUtils.TruncateAt.END);
                 canvas.drawText(ellipsizeValueText.toString(), 0, yPos, textPaint);
-                return availableWidth;
             } else {
-                canvas.drawText(text, 0, yPos, textPaint);
-                return widthValueText;
+                int xPos = 0;
+                if (textToRight) {
+                    xPos = availableWidth - widthValueText;
+                }
+                canvas.drawText(text, xPos, yPos, textPaint);
             }
         }
-        return 0;
     }
 
     public ListSelectorView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         labelTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         labelTextPaint.setStyle(Paint.Style.STROKE);
-        valueTextPaint= new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        valueTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         valueTextPaint.setStyle(Paint.Style.STROKE);
         post(new Runnable() {
             @Override
