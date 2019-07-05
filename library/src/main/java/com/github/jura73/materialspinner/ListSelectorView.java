@@ -1,12 +1,15 @@
 package com.github.jura73.materialspinner;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -14,7 +17,7 @@ import android.view.View;
 
 import java.util.List;
 
-public final class ListSelectorWidget<T> extends View {
+public final class ListSelectorView<T> extends View {
     public static final int INVALID_POSITION = -1;
     public static final int ALPHA = 85;
 
@@ -25,22 +28,21 @@ public final class ListSelectorWidget<T> extends View {
     private OnItemSelectedListener<T> mOnItemSelectedListener;
     private int mSelectedPosition = INVALID_POSITION;
 
-    public ListSelectorWidget(Context context) {
+    public ListSelectorView(Context context) {
         this(context, null);
     }
 
     int spase = 10;
     TextPaint textPaint;
-    String hint = "cities in Italy";
-    String valueText = "";
+    @NonNull
+    String textLabel = "";
+    @Nullable
+    String valueText = null;
+    Drawable mDrawable;
 
-    public ListSelectorWidget(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public ListSelectorView(@NonNull Context context, @Nullable AttributeSet attrs) {
         //  this(context, attrs, R.attr.listSelectorWidgetStyle);//R.attr.listSelectorStyle
         this(context, attrs, R.style.ListSelectorWidget);//R.attr.listSelectorStyle
-        textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setStyle(Paint.Style.STROKE);
-        float scaledSizeInPixels = getResources().getDimensionPixelSize(R.dimen.fontSize);
-        textPaint.setTextSize(scaledSizeInPixels);
     }
 
     public void setText(String text) {
@@ -48,73 +50,71 @@ public final class ListSelectorWidget<T> extends View {
         invalidate();
     }
 
-    //
-    //   @Override
-
     @Override
     protected void onDraw(Canvas canvas) {
+        int availableWidth = getWidth() - getPaddingRight() - getPaddingLeft();
+        canvas.translate(getPaddingLeft(), 0);
+
+        final int height = getHeight();
+        int topDrawable = (height - mDrawable.getIntrinsicHeight()) / 2;
+
+        mDrawable.setBounds(availableWidth - mDrawable.getIntrinsicWidth(), topDrawable, availableWidth, topDrawable + mDrawable.getIntrinsicHeight());
+        mDrawable.draw(canvas);
+
+        availableWidth -= mDrawable.getIntrinsicWidth();
+
         int yPos = -Math.round(textPaint.getFontMetrics().top);
 
         // Draw Label
-        String textLabel = hint;
-        // ширина текста
-
-        int widthLabelText = Math.round(textPaint.measureText(textLabel));
-        int paddingLeft = getPaddingLeft();
-        canvas.drawText(textLabel, paddingLeft, yPos, textPaint);
-        //
+        int dx = drawText(canvas, textLabel, availableWidth, yPos);
+        canvas.translate(dx, 0);
+        availableWidth -=dx;
         // Draw Value
-        String textValue = valueText;
-        int widthValueText = Math.round(textPaint.measureText(textValue));
-        int compoundPaddingLeftValueText = paddingLeft + widthLabelText + spase;
-        int maxWidthValueText = getWidth() - compoundPaddingLeftValueText;
-        if (widthValueText > maxWidthValueText) {
-            CharSequence ellipsizeValueText = TextUtils.ellipsize(textValue, textPaint, maxWidthValueText, TextUtils.TruncateAt.END);
-            canvas.drawText(ellipsizeValueText.toString(), compoundPaddingLeftValueText, yPos, textPaint);
-        } else {
-            int xPos = getWidth() - widthValueText;
-            canvas.drawText(textValue, xPos, yPos, textPaint);
-        }
+        drawText(canvas, valueText, availableWidth, yPos);
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-
-        int width = widthSize;
-        int height = heightSize;
-
-        if (heightMode != MeasureSpec.EXACTLY) {
-            // Parent has told us how big to be. So be it.
-            height = Math.round(textPaint.getTextSize() + textPaint.getFontMetrics().bottom * getResources().getDisplayMetrics().density);// 12 TODO текс ровно посередине но не так как в TextView
-            if (heightMode == MeasureSpec.AT_MOST) {
-                height = Math.min(height, heightSize);
+    protected int drawText(Canvas canvas, String text, int availableWidth, int yPos) {
+        if (text != null && availableWidth > 0) {
+            int widthValueText = Math.round(textPaint.measureText(text));
+            if (widthValueText > availableWidth) {
+                CharSequence ellipsizeValueText = TextUtils.ellipsize(text, textPaint, availableWidth, TextUtils.TruncateAt.END);
+                canvas.drawText(ellipsizeValueText.toString(), 0, yPos, textPaint);
+                return availableWidth;
+            }
+            else {
+                canvas.drawText(text, 0, yPos, textPaint);
+                return widthValueText;
             }
         }
-        setMeasuredDimension(width, height);
+        return 0;
     }
 
-
-    public ListSelectorWidget(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ListSelectorView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setStyle(Paint.Style.STROKE);
         post(new Runnable() {
             @Override
             public void run() {
                 restorePosition();
             }
         });
-        //   TypedArray typedArrayMaterialSpinner = context.obtainStyledAttributes(attrs, R.styleable.MaterialSpinner);
-        //  Drawable[] drawables = getCompoundDrawables();
-        // if (drawables[2] == null) {
-        //      Drawable arrowDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_keyboard_arrow_right, null);
-        // setCompoundDrawablesWithIntrinsicBounds(drawables[0], drawables[1], arrowDrawable, drawables[3]);
-        //  }
+        TypedArray typedArrayListSelectorView = context.obtainStyledAttributes(attrs, R.styleable.ListSelectorView);
 
+        textLabel = typedArrayListSelectorView.getNonResourceString(R.styleable.ListSelectorView_lsw_label);
+        if (textLabel == null) {
+            textLabel = "";
+        }
+        valueText = typedArrayListSelectorView.getNonResourceString(R.styleable.ListSelectorView_lsw_value);
 
-//
+        mDrawable = typedArrayListSelectorView.getDrawable(R.styleable.ListSelectorView_android_drawableEnd);
+        if (mDrawable == null) {
+            mDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_keyboard_arrow_right, null);
+        }
+        int scaledSizeInPixels = getResources().getDimensionPixelSize(R.dimen.fontSize);
+        int textSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_android_textSize, scaledSizeInPixels);
+        textPaint.setTextSize(textSize);
+
 //        ColorStateList colors = typedArrayMaterialSpinner.getColorStateList(R.styleable.MaterialSpinner_android_textColor);
 //        if (colors != null) {
 //           // setTextColor(colors);
@@ -129,7 +129,7 @@ public final class ListSelectorWidget<T> extends View {
 //            String[] res = getContext().getResources().getStringArray(entriesResourceId);
 //            mArrayList = (List<T>) Arrays.asList(res);
 //        }
-//        typedArraySpinner.recycle();
+        typedArrayListSelectorView.recycle();
     }
 
     public final void setList(@Nullable List<T> arrayList) {
@@ -225,7 +225,7 @@ public final class ListSelectorWidget<T> extends View {
                 public void onItemSelected(@NonNull T item, @NonNull View view, int position) {
                     setSelectionPosition(position);
                     if (mOnItemSelectedListener != null) {
-                        mOnItemSelectedListener.onItemSelected(item, ListSelectorWidget.this, position);
+                        mOnItemSelectedListener.onItemSelected(item, ListSelectorView.this, position);
                     }
 
                 }
@@ -250,6 +250,26 @@ public final class ListSelectorWidget<T> extends View {
             mSelectedPosition = ss.stateToSave;
         }
         super.onRestoreInstanceState(null);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+        int width = widthSize;
+        int height = heightSize;
+
+        if (heightMode != MeasureSpec.EXACTLY) {
+            // Parent has told us how big to be. So be it.
+            height = Math.round(textPaint.getTextSize() + textPaint.getFontMetrics().bottom * getResources().getDisplayMetrics().density);// 12 TODO текс ровно посередине но не так как в TextView
+            if (heightMode == MeasureSpec.AT_MOST) {
+                height = Math.min(height, heightSize);
+            }
+        }
+        setMeasuredDimension(width, height);
     }
 
     static class SavedState implements Parcelable {

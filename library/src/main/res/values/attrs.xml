@@ -3,6 +3,18 @@
 
     <attr name="listSelectorWidgetStyle" format="reference" />
 
+    <declare-styleable name="ListSelectorView">
+        <attr name="android:enabled" />
+        <attr name="android:entries" />
+        <attr name="android:textColor" />
+
+
+        <attr name="android:textSize" />
+        <attr name="android:drawableEnd"/>
+        <attr name="lsw_label" format="string"/>
+        <attr name="lsw_value" format="string"/>
+    </declare-styleable>
+
     <declare-styleable name="MaterialSpinner">
         <attr name="android:enabled" />
         <attr name="android:entries" />

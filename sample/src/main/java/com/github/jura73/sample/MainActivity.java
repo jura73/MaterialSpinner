@@ -4,14 +4,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ContextThemeWrapper;
-import android.support.v7.widget.AppCompatButton;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
-import com.github.jura73.materialspinner.ListSelectorWidget;
+import com.github.jura73.materialspinner.ListSelectorView;
 import com.github.jura73.materialspinner.MaterialSpinner;
 import com.github.jura73.materialspinner.OnItemSelectedListener;
 
@@ -20,7 +17,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    ListSelectorWidget<String> listSelector1;
+    ListSelectorView<String> listSelector1;
 
     MaterialSpinner<String> materialSpinner1;
     MaterialSpinner<String> materialSpinner2;
@@ -37,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
         listSelector1 = findViewById(R.id.listSelector1);
         listSelector1.setList(list_of_cities);
-        ListSelectorWidget<String>  listSelector2 = findViewById(R.id.listSelector2);
+        ListSelectorView<String>  listSelector2 = findViewById(R.id.listSelector2);
         listSelector2.setList(list_of_cities);
 
         materialSpinner1 = findViewById(R.id.materialSpinner1);
