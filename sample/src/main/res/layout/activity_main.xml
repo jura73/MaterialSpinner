@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:ellipsize="marquee"
         android:entries="@array/list_of_cities_in_Italy"
-        app:lsw_label="cities in Italy cities in 1234567890-"
+        app:lsw_label="cities in Italy"
         android:singleLine="true"
         android:paddingLeft="24dp"
         android:drawableEnd="@drawable/ic_arrow_back_white_24dp"

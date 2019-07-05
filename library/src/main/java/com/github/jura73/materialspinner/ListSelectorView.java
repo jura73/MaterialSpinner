@@ -32,12 +32,13 @@ public final class ListSelectorView<T> extends View {
         this(context, null);
     }
 
-    int spase = 10;
-    TextPaint textPaint;
-    @NonNull
-    String textLabel = "";
+    int space = 10;
+    TextPaint labelTextPaint;
+    TextPaint valueTextPaint;
     @Nullable
-    String valueText = null;
+    String textLabel;
+    @Nullable
+    String valueText;
     Drawable mDrawable;
 
     public ListSelectorView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -63,25 +64,23 @@ public final class ListSelectorView<T> extends View {
 
         availableWidth -= mDrawable.getIntrinsicWidth();
 
-        int yPos = -Math.round(textPaint.getFontMetrics().top);
-
         // Draw Label
-        int dx = drawText(canvas, textLabel, availableWidth, yPos);
+        int dx = drawText(canvas, textLabel, availableWidth, labelTextPaint);
         canvas.translate(dx, 0);
-        availableWidth -=dx;
+        availableWidth -= dx;
         // Draw Value
-        drawText(canvas, valueText, availableWidth, yPos);
+        drawText(canvas, valueText, availableWidth, valueTextPaint);
     }
 
-    protected int drawText(Canvas canvas, String text, int availableWidth, int yPos) {
+    protected int drawText(Canvas canvas, String text, int availableWidth,  TextPaint  textPaint) {
         if (text != null && availableWidth > 0) {
+            int yPos = -Math.round(textPaint.getFontMetrics().top);
             int widthValueText = Math.round(textPaint.measureText(text));
             if (widthValueText > availableWidth) {
                 CharSequence ellipsizeValueText = TextUtils.ellipsize(text, textPaint, availableWidth, TextUtils.TruncateAt.END);
                 canvas.drawText(ellipsizeValueText.toString(), 0, yPos, textPaint);
                 return availableWidth;
-            }
-            else {
+            } else {
                 canvas.drawText(text, 0, yPos, textPaint);
                 return widthValueText;
             }
@@ -91,8 +90,10 @@ public final class ListSelectorView<T> extends View {
 
     public ListSelectorView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setStyle(Paint.Style.STROKE);
+        labelTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        labelTextPaint.setStyle(Paint.Style.STROKE);
+        valueTextPaint= new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        valueTextPaint.setStyle(Paint.Style.STROKE);
         post(new Runnable() {
             @Override
             public void run() {
@@ -102,9 +103,6 @@ public final class ListSelectorView<T> extends View {
         TypedArray typedArrayListSelectorView = context.obtainStyledAttributes(attrs, R.styleable.ListSelectorView);
 
         textLabel = typedArrayListSelectorView.getNonResourceString(R.styleable.ListSelectorView_lsw_label);
-        if (textLabel == null) {
-            textLabel = "";
-        }
         valueText = typedArrayListSelectorView.getNonResourceString(R.styleable.ListSelectorView_lsw_value);
 
         mDrawable = typedArrayListSelectorView.getDrawable(R.styleable.ListSelectorView_android_drawableEnd);
@@ -113,7 +111,9 @@ public final class ListSelectorView<T> extends View {
         }
         int scaledSizeInPixels = getResources().getDimensionPixelSize(R.dimen.fontSize);
         int textSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_android_textSize, scaledSizeInPixels);
-        textPaint.setTextSize(textSize);
+        labelTextPaint.setTextSize(textSize);
+        valueTextPaint.setTextSize(textSize);
+        valueTextPaint.setAlpha(ALPHA);
 
 //        ColorStateList colors = typedArrayMaterialSpinner.getColorStateList(R.styleable.MaterialSpinner_android_textColor);
 //        if (colors != null) {
@@ -264,7 +264,7 @@ public final class ListSelectorView<T> extends View {
 
         if (heightMode != MeasureSpec.EXACTLY) {
             // Parent has told us how big to be. So be it.
-            height = Math.round(textPaint.getTextSize() + textPaint.getFontMetrics().bottom * getResources().getDisplayMetrics().density);// 12 TODO текс ровно посередине но не так как в TextView
+            height = Math.round(labelTextPaint.getTextSize() + labelTextPaint.getFontMetrics().bottom * getResources().getDisplayMetrics().density);// 12 TODO текс ровно посередине но не так как в TextView
             if (heightMode == MeasureSpec.AT_MOST) {
                 height = Math.min(height, heightSize);
             }
