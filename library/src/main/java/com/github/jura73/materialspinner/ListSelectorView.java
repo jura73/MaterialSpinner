@@ -17,7 +17,7 @@ import android.view.View;
 
 import java.util.List;
 
-public final class ListSelectorView<T> extends View {
+public class ListSelectorView<T> extends View {
     public static final int INVALID_POSITION = -1;
     public static final int ALPHA = 85;
 
@@ -40,7 +40,7 @@ public final class ListSelectorView<T> extends View {
     @Nullable
     String valueText;
     Drawable mDrawable;
-    
+
     public ListSelectorView(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
@@ -125,7 +125,7 @@ public final class ListSelectorView<T> extends View {
         int scaledSizeInPixels = getResources().getDimensionPixelSize(R.dimen.fontSize);
         int textSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_android_textSize, scaledSizeInPixels);
         labelTextPaint.setTextSize(textSize);
-        valueTextPaint.setTextSize(textSize);
+        valueTextPaint.setTextSize(textSize - 1);
         valueTextPaint.setAlpha(ALPHA);
         spaceSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_lsw_spaceSize, scaledSizeInPixels / 2);
 
