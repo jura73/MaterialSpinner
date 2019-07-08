@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Filter;
 import android.widget.Filterable;
 
@@ -13,8 +14,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-class SelectableListAdapter<T> extends RecyclerView.Adapter<SelectableListAdapter.ViewHolderItem<T>>
-        implements Filterable {
+class SelectableListAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements Filterable, View.OnClickListener {
+
+    private static final int VIEW_TYPE_HEADER = 0;
+    private static final int VIEW_TYPE_ITEM = 1;
     private View.OnClickListener onClickListener;
     private List<T> mAdapterItems;
     private List<T> sourceItems;
@@ -41,7 +45,7 @@ class SelectableListAdapter<T> extends RecyclerView.Adapter<SelectableListAdapte
         }
     };
 
-    SelectableListAdapter(List<T> adapterItems, LinkedHashSet<T> selectedItems, View.OnClickListener onClickListener) {
+    SelectableListAdapter(@NonNull List<T> adapterItems, @NonNull LinkedHashSet<T> selectedItems, @NonNull View.OnClickListener onClickListener) {
         sourceItems = adapterItems;
         mAdapterItems = adapterItems;
         this.onClickListener = onClickListener;
@@ -50,27 +54,77 @@ class SelectableListAdapter<T> extends RecyclerView.Adapter<SelectableListAdapte
 
     @NonNull
     @Override
-    public ViewHolderItem onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.selectable_item_list, parent, false);
-        itemView.setOnClickListener(onClickListener);
-        return new ViewHolderItem(itemView);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == VIEW_TYPE_HEADER) {
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.selectable_header_list, parent, false);
+            itemView.setOnClickListener(this);
+            return new ViewHolderHeader(itemView);
+        } else {
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.selectable_item_list, parent, false);
+            itemView.setOnClickListener(this);
+            return new ViewHolderItem(itemView);
+        }
     }
 
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+        if (getItemViewType(position) == VIEW_TYPE_HEADER) {
+            ((ViewHolderHeader) viewHolder).onBind(linkedHashSet.containsAll(sourceItems));
+        } else {
+            T item = mAdapterItems.get(position - 1);
+            ((ViewHolderItem) viewHolder).onBind(item, linkedHashSet.contains(item));
+        }
+    }
 
-    public void onBindViewHolder(@NonNull ViewHolderItem<T> viewHolderItem, int position) {
-        T item = mAdapterItems.get(position);
-        viewHolderItem.onBind(item, linkedHashSet.contains(item));
+    @Override
+    public int getItemViewType(int position) {
+        return position == 0 ? VIEW_TYPE_HEADER : VIEW_TYPE_ITEM;
     }
 
     @Override
     public int getItemCount() {
-        return mAdapterItems.size();
+        return mAdapterItems.size() + 1;
     }
 
     @Override
     public Filter getFilter() {
         return mFilter;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v instanceof CompoundButton){
+            if(v.getId() == R.id.checkboxHeader) {
+                CompoundButton compoundButton = (CompoundButton) v;
+                if (compoundButton.isChecked()) {
+                    linkedHashSet.addAll(sourceItems);
+                } else {
+                    linkedHashSet.clear();
+                }
+                compoundButton.setChecked(!compoundButton.isChecked());
+                notifyDataSetChanged();
+            }
+            else {
+                onClickListener.onClick(v);
+                notifyItemChanged(0);
+            }
+        }
+    }
+
+    static class ViewHolderHeader extends RecyclerView.ViewHolder {
+
+        private final AppCompatCheckBox checkBox;
+
+        ViewHolderHeader(View itemView) {
+            super(itemView);
+            checkBox = (AppCompatCheckBox) itemView;
+        }
+
+        void onBind(boolean isSelected) {
+            checkBox.setChecked(isSelected);
+        }
     }
 
     static class ViewHolderItem<T> extends RecyclerView.ViewHolder {

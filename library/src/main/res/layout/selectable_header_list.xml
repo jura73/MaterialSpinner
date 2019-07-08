@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.AppCompatCheckBox xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/checkboxHeader"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingLeft="16dp"
@@ -9,4 +10,5 @@
     android:layout_marginStart="12dp"
     android:textColor="@android:color/black"
     android:drawablePadding="32dp"
+    android:text="@string/text_all"
     android:textSize="16sp" />
