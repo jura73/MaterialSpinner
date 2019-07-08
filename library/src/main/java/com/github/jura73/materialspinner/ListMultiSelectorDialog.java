@@ -11,7 +11,7 @@ import android.view.View;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-public class ListMultiSelectorDialog<T> extends Dialog implements View.OnClickListener {
+public class ListMultiSelectorDialog<T> extends Dialog{
     private final List<T> mItemList;
 
     private final LinkedHashSet<T> linkedHashSet;
@@ -38,7 +38,7 @@ public class ListMultiSelectorDialog<T> extends Dialog implements View.OnClickLi
         View view = inflater.inflate(R.layout.dialog_list, null);
 
         RecyclerView recyclerView = view.findViewById(R.id.rvAutocompleteSuggestions);
-        adapter = new SelectableListAdapter<>(mItemList, linkedHashSet, this);
+        adapter = new SelectableListAdapter<>(mItemList, linkedHashSet);
         recyclerView.setAdapter(adapter);
         recyclerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -54,15 +54,5 @@ public class ListMultiSelectorDialog<T> extends Dialog implements View.OnClickLi
     public void onBackPressed() {
         onItemMultiSelectedListener.onItemsSelected(linkedHashSet, null);
         super.onBackPressed();
-    }
-
-    @Override
-    public void onClick(View v) {
-        T itemSelected = (T) v.getTag();
-        if (linkedHashSet.contains(itemSelected)) {
-            linkedHashSet.remove(itemSelected);
-        } else {
-            linkedHashSet.add(itemSelected);
-        }
     }
 }

@@ -19,7 +19,6 @@ class SelectableListAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_ITEM = 1;
-    private View.OnClickListener onClickListener;
     private List<T> mAdapterItems;
     private List<T> sourceItems;
     private final LinkedHashSet<T> linkedHashSet;
@@ -45,10 +44,9 @@ class SelectableListAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     };
 
-    SelectableListAdapter(@NonNull List<T> adapterItems, @NonNull LinkedHashSet<T> selectedItems, @NonNull View.OnClickListener onClickListener) {
+    SelectableListAdapter(@NonNull List<T> adapterItems, @NonNull LinkedHashSet<T> selectedItems) {
         sourceItems = adapterItems;
         mAdapterItems = adapterItems;
-        this.onClickListener = onClickListener;
         linkedHashSet = selectedItems;
     }
 
@@ -103,11 +101,15 @@ class SelectableListAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHol
                 } else {
                     linkedHashSet.clear();
                 }
-                compoundButton.setChecked(!compoundButton.isChecked());
                 notifyDataSetChanged();
             }
             else {
-                onClickListener.onClick(v);
+                T itemSelected = (T) v.getTag();
+                if (linkedHashSet.contains(itemSelected)) {
+                    linkedHashSet.remove(itemSelected);
+                } else {
+                    linkedHashSet.add(itemSelected);
+                }
                 notifyItemChanged(0);
             }
         }
