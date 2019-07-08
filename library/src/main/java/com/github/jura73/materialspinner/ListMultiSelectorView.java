@@ -1,22 +1,22 @@
 package com.github.jura73.materialspinner;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 public class ListMultiSelectorView<T> extends ListSelectorView<T> {
 
+    @Nullable
     private OnItemMultiSelectedListener<T> mOnItemMultiSelectedListener;
+    @Nullable
     private LinkedHashSet<T> linkedHashSet;
-
-    private List<Integer> mSelectedPositionList = new ArrayList<>();
+    SavedState savedState = null;
 
     public ListMultiSelectorView(Context context) {
         super(context);
@@ -33,12 +33,12 @@ public class ListMultiSelectorView<T> extends ListSelectorView<T> {
     @Override
     protected void showSpinnerListDialog() {
         if (mArrayList != null) {
-             new ListMultiSelectorDialog<>(getContext(), mArrayList, linkedHashSet, new OnItemMultiSelectedListener<T>() {
+            new ListMultiSelectorDialog<>(getContext(), mArrayList, linkedHashSet, new OnItemMultiSelectedListener<T>() {
                 @Override
                 public void onItemsSelected(@NonNull LinkedHashSet<T> items, @NonNull View view) {
-                    linkedHashSet = items;
-                    setSelectionListPosition(items);
-                    if(mOnItemMultiSelectedListener!= null) {
+
+                    setSelectionList(items);
+                    if (mOnItemMultiSelectedListener != null) {
                         mOnItemMultiSelectedListener.onItemsSelected(items, ListMultiSelectorView.this);
                     }
                 }
@@ -46,12 +46,20 @@ public class ListMultiSelectorView<T> extends ListSelectorView<T> {
         }
     }
 
-    public void setSelectionListPosition(@NonNull Collection<T> items) {
+    @Override
+    public void setSelectionItem(T item) {
+        LinkedHashSet<T> set = new LinkedHashSet<>();
+        set.add(item);
+        setSelectionList(set);
+    }
+
+    public void setSelectionList(@NonNull LinkedHashSet<T> items) {
+        linkedHashSet = items;
         if (!items.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             boolean isNotFirst = false;
-            for(T t : items){
-                if(isNotFirst){
+            for (T t : items) {
+                if (isNotFirst) {
                     sb.append(", ");
                 }
                 sb.append(t.toString());
@@ -59,11 +67,84 @@ public class ListMultiSelectorView<T> extends ListSelectorView<T> {
             }
             setText(sb.toString());
         } else {
-            setText(null);
+            if (mDefaultItem != null) {
+                setText(mDefaultItem.toString());
+            } else {
+                setText(null);
+            }
         }
-        T item = this.getSelectedItem();
-        if (item != null) {
-            setText(item.toString());
+    }
+
+    protected void restoreState() {
+        if (savedState != null && savedState.positions != null) {
+            LinkedHashSet<T> set = new LinkedHashSet<>();
+            for (int i : savedState.positions) {
+                set.add(mArrayList.get(i));
+            }
+            setSelectionList(set);
         }
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        super.onSaveInstanceState();
+        SavedState ss = new SavedState();
+        if (linkedHashSet != null && mArrayList != null) {
+            int[] positions = new int[linkedHashSet.size()];
+            int i = 0;
+            for (T t : linkedHashSet) {
+                positions[i] = mArrayList.indexOf(t);
+                i++;
+            }
+            ss.positions = positions;
+        } else {
+            ss.positions = null;
+        }
+
+        return ss;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof SavedState) {
+            SavedState ss = (SavedState) state;
+            super.onRestoreInstanceState(null);
+            savedState = ss;
+        }
+        super.onRestoreInstanceState(null);
+    }
+
+    static class SavedState implements Parcelable {
+
+        private int[] positions;
+
+        SavedState() {
+        }
+
+        protected SavedState(Parcel in) {
+            positions = in.createIntArray();
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeIntArray(positions);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
     }
 }

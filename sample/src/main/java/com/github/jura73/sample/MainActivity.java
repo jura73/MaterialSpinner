@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.github.jura73.materialspinner.ListMultiSelectorView;
+import com.github.jura73.materialspinner.ListOneSelectorView;
 import com.github.jura73.materialspinner.MaterialSpinner;
 import com.github.jura73.materialspinner.OnItemSelectedListener;
 
@@ -17,7 +18,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    ListMultiSelectorView<String> listSelector1;
+    ListOneSelectorView<String> listSelector1;
 
     MaterialSpinner<String> materialSpinner1;
     MaterialSpinner<String> materialSpinner2;

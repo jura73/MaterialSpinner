@@ -5,8 +5,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
@@ -17,16 +15,14 @@ import android.view.View;
 
 import java.util.List;
 
-public class ListSelectorView<T> extends View {
-    public static final int INVALID_POSITION = -1;
+abstract class ListSelectorView<T> extends View {
+
     public static final int ALPHA = 85;
 
     private boolean isShowChoiceAfterFilling;
     protected List<T> mArrayList;
-    private T mDefaultItem;
+    protected T mDefaultItem;
     private OnClickListener mOnLazyLoading;
-    private OnItemSelectedListener<T> mOnItemSelectedListener;
-    private int mSelectedPosition = INVALID_POSITION;
 
     public ListSelectorView(Context context) {
         this(context, null);
@@ -45,7 +41,7 @@ public class ListSelectorView<T> extends View {
         this(context, attrs, 0);
     }
 
-    public void setText( @Nullable String text) {
+    public void setText(@Nullable String text) {
         valueText = text;
         invalidate();
     }
@@ -110,7 +106,7 @@ public class ListSelectorView<T> extends View {
         post(new Runnable() {
             @Override
             public void run() {
-                restorePosition();
+                restoreState();
             }
         });
         TypedArray typedArrayListSelectorView = context.obtainStyledAttributes(attrs, R.styleable.ListSelectorView);
@@ -153,36 +149,34 @@ public class ListSelectorView<T> extends View {
             this.showSpinnerListDialog();
             this.isShowChoiceAfterFilling = false;
         }
-        restorePosition();
+        restoreState();
     }
 
     public final void setListWithAutoSelect(@Nullable List<T> arrayList) {
         mArrayList = arrayList;
         if (arrayList != null) {
             if (mArrayList.size() == 1) {
-                this.setSelectionPosition(0);
+                setSelectionItem(arrayList.get(0));
             } else if (this.isShowChoiceAfterFilling) {
                 this.showSpinnerListDialog();
                 this.isShowChoiceAfterFilling = false;
             }
-            restorePosition();
+            restoreState();
         }
     }
 
-    public final void restorePosition() {
-        if (mSelectedPosition != INVALID_POSITION) {
-            setSelectionPosition(mSelectedPosition);
-        }
+    public abstract void setSelectionItem(T item) ;
+
+    protected void restoreState() {
     }
 
-    public final void clear() {
+    public void clear() {
         this.mArrayList = null;
-        this.resetPosition();
+        this.cleanSelected();
     }
 
-    public final void resetPosition() {
+    public void cleanSelected() {
         setText("");
-        this.mSelectedPosition = -1;
     }
 
     public final void setDefaultItem(@Nullable T item) {
@@ -196,26 +190,6 @@ public class ListSelectorView<T> extends View {
 
     public final void setLazyLoading(@Nullable OnClickListener onClickListener) {
         this.mOnLazyLoading = onClickListener;
-    }
-
-    public void setSelectionPosition(int position) {
-        this.mSelectedPosition = position;
-        T item = this.getSelectedItem();
-        if (item != null) {
-            setText(item.toString());
-        }
-    }
-
-    @Nullable
-    public T getSelectedItem() {
-        if (mArrayList != null && mArrayList.size() > mSelectedPosition && mSelectedPosition >= 0) {
-            return mArrayList.get(mSelectedPosition);
-        }
-        return mDefaultItem;
-    }
-
-    public final void setOnItemSelectedListener(OnItemSelectedListener<T> onItemSelectedListener) {
-        mOnItemSelectedListener = onItemSelectedListener;
     }
 
     @Override
@@ -232,39 +206,7 @@ public class ListSelectorView<T> extends View {
         return super.performClick();
     }
 
-    protected void showSpinnerListDialog() {
-        if (mArrayList != null) {
-            ListDialog<T> dialog = new ListDialog<>(getContext(), mArrayList, new OnItemSelectedListener<T>() {
-                @Override
-                public void onItemSelected(@NonNull T item, @NonNull View view, int position) {
-                    setSelectionPosition(position);
-                    if (mOnItemSelectedListener != null) {
-                        mOnItemSelectedListener.onItemSelected(item, ListSelectorView.this, position);
-                    }
-
-                }
-            });
-            dialog.show();
-        }
-    }
-
-    @Override
-    public Parcelable onSaveInstanceState() {
-        super.onSaveInstanceState();
-        SavedState ss = new SavedState();
-        ss.stateToSave = mSelectedPosition;
-        return ss;
-    }
-
-    @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        if (state instanceof SavedState) {
-            SavedState ss = (SavedState) state;
-            super.onRestoreInstanceState(null);
-            mSelectedPosition = ss.stateToSave;
-        }
-        super.onRestoreInstanceState(null);
-    }
+    protected abstract void showSpinnerListDialog();
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -284,36 +226,5 @@ public class ListSelectorView<T> extends View {
             }
         }
         setMeasuredDimension(width, height);
-    }
-
-    static class SavedState implements Parcelable {
-        public static final Creator<SavedState> CREATOR =
-                new Creator<SavedState>() {
-                    public SavedState createFromParcel(Parcel in) {
-                        return new SavedState(in);
-                    }
-
-                    public SavedState[] newArray(int size) {
-                        return new SavedState[size];
-                    }
-                };
-        int stateToSave;
-
-        SavedState() {
-        }
-
-        private SavedState(Parcel in) {
-            stateToSave = in.readInt();
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            out.writeInt(stateToSave);
-        }
     }
 }
