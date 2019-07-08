@@ -22,7 +22,7 @@ public class ListSelectorView<T> extends View {
     public static final int ALPHA = 85;
 
     private boolean isShowChoiceAfterFilling;
-    private List<T> mArrayList;
+    protected List<T> mArrayList;
     private T mDefaultItem;
     private OnClickListener mOnLazyLoading;
     private OnItemSelectedListener<T> mOnItemSelectedListener;
@@ -45,7 +45,7 @@ public class ListSelectorView<T> extends View {
         this(context, attrs, 0);
     }
 
-    public void setText(String text) {
+    public void setText( @Nullable String text) {
         valueText = text;
         invalidate();
     }
@@ -198,7 +198,7 @@ public class ListSelectorView<T> extends View {
         this.mOnLazyLoading = onClickListener;
     }
 
-    public final void setSelectionPosition(int position) {
+    public void setSelectionPosition(int position) {
         this.mSelectedPosition = position;
         T item = this.getSelectedItem();
         if (item != null) {
@@ -232,7 +232,7 @@ public class ListSelectorView<T> extends View {
         return super.performClick();
     }
 
-    private void showSpinnerListDialog() {
+    protected void showSpinnerListDialog() {
         if (mArrayList != null) {
             ListDialog<T> dialog = new ListDialog<>(getContext(), mArrayList, new OnItemSelectedListener<T>() {
                 @Override
