@@ -134,7 +134,7 @@ abstract class ListSelectorView<T> extends View {
         valueTextPaint.setAlpha(ALPHA);
         spaceSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_lsw_spaceSize, scaledSizeInPixels / 2);
 
-        setEnabled(typedArrayListSelectorView.getBoolean(R.styleable.MaterialSpinner_android_enabled, true));
+        setEnabled(typedArrayListSelectorView.getBoolean(R.styleable.ListSelectorView_android_enabled, true));
         typedArrayListSelectorView.recycle();
     }
 
@@ -186,6 +186,7 @@ abstract class ListSelectorView<T> extends View {
 
     public final void setLazyLoading(@Nullable OnClickListener onClickListener) {
         this.mOnLazyLoading = onClickListener;
+        setClickable(true);
     }
 
     @Override

@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.github.jura73.materialspinner.ListMultiSelectorView;
-import com.github.jura73.materialspinner.ListOneSelectorView;
 import com.github.jura73.materialspinner.MaterialSpinner;
 import com.github.jura73.materialspinner.OnItemSelectedListener;
 
@@ -17,8 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
-    ListOneSelectorView<String> listSelector1;
 
     MaterialSpinner<String> materialSpinner1;
     MaterialSpinner<String> materialSpinner2;
@@ -33,8 +30,6 @@ public class MainActivity extends AppCompatActivity {
         String[] stringArray = getResources().getStringArray(R.array.list_of_cities_in_Italy);
         list_of_cities = Arrays.asList(stringArray);
 
-        listSelector1 = findViewById(R.id.listSelector1);
-        listSelector1.setList(list_of_cities);
         final ListMultiSelectorView<String> listSelector2 = findViewById(R.id.listSelector2);
         listSelector2.setList(list_of_cities);
 
