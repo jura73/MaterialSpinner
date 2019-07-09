@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         listSelector1 = findViewById(R.id.listSelector1);
         listSelector1.setList(list_of_cities);
-        ListMultiSelectorView<String> listSelector2 = findViewById(R.id.listSelector2);
+        final ListMultiSelectorView<String> listSelector2 = findViewById(R.id.listSelector2);
         listSelector2.setList(list_of_cities);
 
         materialSpinner1 = findViewById(R.id.materialSpinner1);
@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
                 }, 1000);
             }
         });
-
         materialSpinner2.setOnItemSelectedListener(new OnItemSelectedListener<String>() {
             @Override
             public void onItemSelected(@NonNull String item, @NonNull View view, int position) {

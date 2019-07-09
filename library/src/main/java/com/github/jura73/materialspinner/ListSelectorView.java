@@ -70,19 +70,27 @@ abstract class ListSelectorView<T> extends View {
 
         availableWidth -= mDrawable.getIntrinsicWidth();
 
+        canvas.translate(0, height >> 1);
         // Draw Label
         drawText(canvas, textLabel, availableWidth, labelTextPaint, false);
-        int widthValueText = Math.round(labelTextPaint.measureText(textLabel));
-        canvas.translate(widthValueText + spaceSize, 0);
-        availableWidth -= widthValueText + spaceSize;
+        int widthValueTextWithSpace = getWidthValueTextWithSpace();
+        canvas.translate(widthValueTextWithSpace, 0);
+        availableWidth -= widthValueTextWithSpace;
         // Draw Value
-
         drawText(canvas, valueText, availableWidth, valueTextPaint, true);
+    }
+
+    private int getWidthValueTextWithSpace() {
+        int widthValueText = 0;
+        if (textLabel != null) {
+            widthValueText = Math.round(labelTextPaint.measureText(textLabel));
+        }
+        return widthValueText + spaceSize;
     }
 
     protected void drawText(Canvas canvas, String text, int availableWidth, TextPaint textPaint, boolean textToRight) {
         if (text != null && availableWidth > 0) {
-            int yPos = -Math.round(textPaint.getFontMetrics().top);
+            int yPos = Math.round(textPaint.getFontMetrics().descent);
             int widthValueText = Math.round(textPaint.measureText(text));
             if (widthValueText > availableWidth) {
                 CharSequence ellipsizeValueText = TextUtils.ellipsize(text, textPaint, availableWidth, TextUtils.TruncateAt.END);
@@ -101,6 +109,7 @@ abstract class ListSelectorView<T> extends View {
         super(context, attrs, defStyleAttr);
         labelTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         labelTextPaint.setStyle(Paint.Style.STROKE);
+
         valueTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         valueTextPaint.setStyle(Paint.Style.STROKE);
         post(new Runnable() {
@@ -111,8 +120,8 @@ abstract class ListSelectorView<T> extends View {
         });
         TypedArray typedArrayListSelectorView = context.obtainStyledAttributes(attrs, R.styleable.ListSelectorView);
 
-        textLabel = typedArrayListSelectorView.getNonResourceString(R.styleable.ListSelectorView_lsw_label);
-        valueText = typedArrayListSelectorView.getNonResourceString(R.styleable.ListSelectorView_lsw_value);
+        textLabel = typedArrayListSelectorView.getString(R.styleable.ListSelectorView_android_hint);
+        valueText = typedArrayListSelectorView.getString(R.styleable.ListSelectorView_lsw_value);
 
         mDrawable = typedArrayListSelectorView.getDrawable(R.styleable.ListSelectorView_android_drawableEnd);
         if (mDrawable == null) {
@@ -125,20 +134,7 @@ abstract class ListSelectorView<T> extends View {
         valueTextPaint.setAlpha(ALPHA);
         spaceSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_lsw_spaceSize, scaledSizeInPixels / 2);
 
-//        ColorStateList colors = typedArrayMaterialSpinner.getColorStateList(R.styleable.MaterialSpinner_android_textColor);
-//        if (colors != null) {
-//           // setTextColor(colors);
-//        }
-//
         setEnabled(typedArrayListSelectorView.getBoolean(R.styleable.MaterialSpinner_android_enabled, true));
-//        typedArrayMaterialSpinner.recycle();
-//
-//        TypedArray typedArraySpinner = getContext().obtainStyledAttributes(attrs, android.support.design.R.styleable.Spinner);
-//        int entriesResourceId = typedArraySpinner.getResourceId(0, -1);
-//        if (entriesResourceId > 0) {
-//            String[] res = getContext().getResources().getStringArray(entriesResourceId);
-//            mArrayList = (List<T>) Arrays.asList(res);
-//        }
         typedArrayListSelectorView.recycle();
     }
 
@@ -165,7 +161,7 @@ abstract class ListSelectorView<T> extends View {
         }
     }
 
-    public abstract void setSelectionItem(T item) ;
+    public abstract void setSelectionItem(T item);
 
     protected void restoreState() {
     }

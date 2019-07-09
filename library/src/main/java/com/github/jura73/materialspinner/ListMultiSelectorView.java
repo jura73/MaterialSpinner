@@ -36,7 +36,6 @@ public class ListMultiSelectorView<T> extends ListSelectorView<T> {
             new ListMultiSelectorDialog<>(getContext(), mArrayList, linkedHashSet, new OnItemMultiSelectedListener<T>() {
                 @Override
                 public void onItemsSelected(@NonNull LinkedHashSet<T> items, @NonNull View view) {
-
                     setSelectionList(items);
                     if (mOnItemMultiSelectedListener != null) {
                         mOnItemMultiSelectedListener.onItemsSelected(items, ListMultiSelectorView.this);
@@ -51,6 +50,10 @@ public class ListMultiSelectorView<T> extends ListSelectorView<T> {
         LinkedHashSet<T> set = new LinkedHashSet<>();
         set.add(item);
         setSelectionList(set);
+    }
+
+    public final void setOnItemMultiSelectedListener(OnItemMultiSelectedListener<T> onItemMultiSelectedListener) {
+        mOnItemMultiSelectedListener = onItemMultiSelectedListener;
     }
 
     public void setSelectionList(@NonNull LinkedHashSet<T> items) {
