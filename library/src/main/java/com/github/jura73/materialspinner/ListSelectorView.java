@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
@@ -117,10 +118,14 @@ abstract class ListSelectorView<T> extends View {
                 restoreState();
             }
         });
+
         TypedArray typedArrayListSelectorView = context.obtainStyledAttributes(attrs, R.styleable.ListSelectorView);
 
         hint = typedArrayListSelectorView.getString(R.styleable.ListSelectorView_android_hint);
         valueText = typedArrayListSelectorView.getString(R.styleable.ListSelectorView_lsw_value);
+        int textColor = typedArrayListSelectorView.getColor(R.styleable.ListSelectorView_android_textColor, getContext().getResources().getColor(R.color.primary_text));
+        hintTextPaint.setColor(textColor);
+        valueTextPaint.setColor(textColor);
 
         mDrawable = typedArrayListSelectorView.getDrawable(R.styleable.ListSelectorView_android_drawableEnd);
         if (mDrawable == null) {
@@ -147,6 +152,11 @@ abstract class ListSelectorView<T> extends View {
         invalidate();
     }
 
+    public void setColor(@ColorInt int color) {
+        hintTextPaint.setColor(color);
+        valueTextPaint.setColor(color);
+    }
+
     public final void setListWithAutoSelect(@Nullable List<T> arrayList) {
         setInnerList(arrayList);
         if (arrayList != null) {
@@ -157,14 +167,14 @@ abstract class ListSelectorView<T> extends View {
         }
     }
 
-    private void showDialogAfterFillingIfNeed(){
+    private void showDialogAfterFillingIfNeed() {
         if (this.isShowChoiceAfterFilling) {
             this.showSpinnerListDialog();
             this.isShowChoiceAfterFilling = false;
         }
     }
 
-    private void setInnerList(@Nullable List<T> arrayList){
+    private void setInnerList(@Nullable List<T> arrayList) {
         setClickable(true);
         mArrayList = arrayList;
         restoreState();
