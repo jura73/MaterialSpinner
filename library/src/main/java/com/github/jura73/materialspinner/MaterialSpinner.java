@@ -11,8 +11,9 @@ import android.view.View;
 public final class MaterialSpinner<T> extends ListSelectorView<T> {
     public static final int INVALID_POSITION = -1;
     private int mRestorePosition = INVALID_POSITION;
-
+    @Nullable
     private OnItemSelectedListener<T> mOnItemSelectedListener;
+    @Nullable
     private T selectedItem = null;
 
     public MaterialSpinner(Context context) {
@@ -69,7 +70,7 @@ public final class MaterialSpinner<T> extends ListSelectorView<T> {
     }
 
     protected void restoreState() {
-        if (mRestorePosition != INVALID_POSITION && mArrayList.size() > mRestorePosition) {
+        if (mRestorePosition != INVALID_POSITION && mArrayList != null && mArrayList.size() > mRestorePosition) {
             setSelectionItem(mArrayList.get(mRestorePosition));
         }
     }
@@ -78,7 +79,7 @@ public final class MaterialSpinner<T> extends ListSelectorView<T> {
     public Parcelable onSaveInstanceState() {
         super.onSaveInstanceState();
         SavedState ss = new SavedState();
-        if (selectedItem != null) {
+        if (selectedItem != null && mArrayList != null) {
             ss.stateToSave = mArrayList.indexOf(selectedItem);
         } else {
             ss.stateToSave = INVALID_POSITION;

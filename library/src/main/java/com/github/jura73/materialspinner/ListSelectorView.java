@@ -21,7 +21,7 @@ abstract class ListSelectorView<T> extends View {
     public static final int ALPHA = 90;
 
     private boolean isShowChoiceAfterFilling;
-    protected List<T> mArrayList;
+    protected  @Nullable List<T> mArrayList;
     private OnClickListener mOnLazyLoading;
 
     public ListSelectorView(Context context) {
@@ -160,7 +160,7 @@ abstract class ListSelectorView<T> extends View {
     public final void setListWithAutoSelect(@Nullable List<T> arrayList) {
         setInnerList(arrayList);
         if (arrayList != null) {
-            if (mArrayList.size() == 1) {
+            if (arrayList.size() == 1) {
                 setSelectionItem(arrayList.get(0));
             } else
                 showDialogAfterFillingIfNeed();

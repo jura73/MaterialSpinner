@@ -75,7 +75,7 @@ public class ListMultiSelectorView<T> extends ListSelectorView<T> {
     }
 
     protected void restoreState() {
-        if (savedState != null && savedState.positions != null) {
+        if (savedState != null && savedState.positions != null && mArrayList != null) {
             LinkedHashSet<T> set = new LinkedHashSet<>();
             for (int i : savedState.positions) {
                 set.add(mArrayList.get(i));
