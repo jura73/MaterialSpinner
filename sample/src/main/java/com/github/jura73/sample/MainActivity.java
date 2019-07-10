@@ -69,6 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
         materialSpinner3 = findViewById(R.id.materialSpinner3);
         materialSpinner3.setList(list_of_cities);
-        materialSpinner3.setDefaultItem("Milan");
+        materialSpinner3.setSelectionItem("Milan");
     }
 }

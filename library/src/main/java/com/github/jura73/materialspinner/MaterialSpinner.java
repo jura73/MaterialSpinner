@@ -59,10 +59,7 @@ public final class MaterialSpinner<T> extends ListSelectorView<T> {
 
     @Nullable
     public T getSelectedItem() {
-        if (selectedItem != null) {
-            return selectedItem;
-        }
-        return mDefaultItem;
+        return selectedItem;
     }
 
     @Override

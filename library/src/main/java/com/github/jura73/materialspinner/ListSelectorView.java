@@ -17,11 +17,10 @@ import java.util.List;
 
 abstract class ListSelectorView<T> extends View {
 
-    public static final int ALPHA = 85;
+    public static final int ALPHA = 90;
 
     private boolean isShowChoiceAfterFilling;
     protected List<T> mArrayList;
-    protected T mDefaultItem;
     private OnClickListener mOnLazyLoading;
 
     public ListSelectorView(Context context) {
@@ -29,10 +28,10 @@ abstract class ListSelectorView<T> extends View {
     }
 
     int spaceSize;
-    TextPaint labelTextPaint;
+    TextPaint hintTextPaint;
     TextPaint valueTextPaint;
     @Nullable
-    String textLabel;
+    String hint;
     @Nullable
     String valueText;
     Drawable mDrawable;
@@ -72,7 +71,7 @@ abstract class ListSelectorView<T> extends View {
 
         canvas.translate(0, height >> 1);
         // Draw Label
-        drawText(canvas, textLabel, availableWidth, labelTextPaint, false);
+        drawText(canvas, hint, availableWidth, hintTextPaint, false);
         int widthValueTextWithSpace = getWidthValueTextWithSpace();
         canvas.translate(widthValueTextWithSpace, 0);
         availableWidth -= widthValueTextWithSpace;
@@ -82,8 +81,8 @@ abstract class ListSelectorView<T> extends View {
 
     private int getWidthValueTextWithSpace() {
         int widthValueText = 0;
-        if (textLabel != null) {
-            widthValueText = Math.round(labelTextPaint.measureText(textLabel));
+        if (hint != null) {
+            widthValueText = Math.round(hintTextPaint.measureText(hint));
         }
         return widthValueText + spaceSize;
     }
@@ -107,8 +106,8 @@ abstract class ListSelectorView<T> extends View {
 
     public ListSelectorView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        labelTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        labelTextPaint.setStyle(Paint.Style.STROKE);
+        hintTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        hintTextPaint.setStyle(Paint.Style.STROKE);
 
         valueTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         valueTextPaint.setStyle(Paint.Style.STROKE);
@@ -120,7 +119,7 @@ abstract class ListSelectorView<T> extends View {
         });
         TypedArray typedArrayListSelectorView = context.obtainStyledAttributes(attrs, R.styleable.ListSelectorView);
 
-        textLabel = typedArrayListSelectorView.getString(R.styleable.ListSelectorView_android_hint);
+        hint = typedArrayListSelectorView.getString(R.styleable.ListSelectorView_android_hint);
         valueText = typedArrayListSelectorView.getString(R.styleable.ListSelectorView_lsw_value);
 
         mDrawable = typedArrayListSelectorView.getDrawable(R.styleable.ListSelectorView_android_drawableEnd);
@@ -129,7 +128,7 @@ abstract class ListSelectorView<T> extends View {
         }
         int scaledSizeInPixels = getResources().getDimensionPixelSize(R.dimen.fontSize);
         int textSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_android_textSize, scaledSizeInPixels);
-        labelTextPaint.setTextSize(textSize);
+        hintTextPaint.setTextSize(textSize);
         valueTextPaint.setTextSize(textSize - 1);
         valueTextPaint.setAlpha(ALPHA);
         spaceSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_lsw_spaceSize, scaledSizeInPixels / 2);
@@ -139,29 +138,39 @@ abstract class ListSelectorView<T> extends View {
     }
 
     public final void setList(@Nullable List<T> arrayList) {
-        setClickable(true);
-        mArrayList = arrayList;
+        setInnerList(arrayList);
+        showDialogAfterFillingIfNeed();
+    }
+
+    public void setHint(String hint) {
+        this.hint = hint;
+        invalidate();
+    }
+
+    public final void setListWithAutoSelect(@Nullable List<T> arrayList) {
+        setInnerList(arrayList);
+        if (arrayList != null) {
+            if (mArrayList.size() == 1) {
+                setSelectionItem(arrayList.get(0));
+            } else
+                showDialogAfterFillingIfNeed();
+        }
+    }
+
+    private void showDialogAfterFillingIfNeed(){
         if (this.isShowChoiceAfterFilling) {
             this.showSpinnerListDialog();
             this.isShowChoiceAfterFilling = false;
         }
+    }
+
+    private void setInnerList(@Nullable List<T> arrayList){
+        setClickable(true);
+        mArrayList = arrayList;
         restoreState();
     }
 
-    public final void setListWithAutoSelect(@Nullable List<T> arrayList) {
-        mArrayList = arrayList;
-        if (arrayList != null) {
-            if (mArrayList.size() == 1) {
-                setSelectionItem(arrayList.get(0));
-            } else if (this.isShowChoiceAfterFilling) {
-                this.showSpinnerListDialog();
-                this.isShowChoiceAfterFilling = false;
-            }
-            restoreState();
-        }
-    }
-
-    public abstract void setSelectionItem(T item);
+    public abstract void setSelectionItem(@Nullable T item);
 
     protected void restoreState() {
     }
@@ -172,16 +181,7 @@ abstract class ListSelectorView<T> extends View {
     }
 
     public void cleanSelected() {
-        setText("");
-    }
-
-    public final void setDefaultItem(@Nullable T item) {
-        mDefaultItem = item;
-        if (item != null) {
-            setText(String.valueOf(item));
-        } else {
-            setText("");
-        }
+        setSelectionItem(null);
     }
 
     public final void setLazyLoading(@Nullable OnClickListener onClickListener) {
@@ -217,7 +217,7 @@ abstract class ListSelectorView<T> extends View {
 
         if (heightMode != MeasureSpec.EXACTLY) {
             // Parent has told us how big to be. So be it.
-            height = Math.round(labelTextPaint.getTextSize() + labelTextPaint.getFontMetrics().bottom * getResources().getDisplayMetrics().density) + getPaddingTop() + getPaddingBottom();
+            height = Math.round(hintTextPaint.getTextSize() + hintTextPaint.getFontMetrics().bottom * getResources().getDisplayMetrics().density) + getPaddingTop() + getPaddingBottom();
             if (heightMode == MeasureSpec.AT_MOST) {
                 height = Math.min(height, heightSize);
             }

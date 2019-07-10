@@ -70,11 +70,7 @@ public class ListMultiSelectorView<T> extends ListSelectorView<T> {
             }
             setText(sb.toString());
         } else {
-            if (mDefaultItem != null) {
-                setText(mDefaultItem.toString());
-            } else {
-                setText(null);
-            }
+            setText(null);
         }
     }
 
@@ -124,7 +120,7 @@ public class ListMultiSelectorView<T> extends ListSelectorView<T> {
         SavedState() {
         }
 
-        protected SavedState(Parcel in) {
+        SavedState(Parcel in) {
             positions = in.createIntArray();
         }
 
