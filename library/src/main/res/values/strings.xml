@@ -1,3 +1,4 @@
 <resources>
     <string name="action_search">Поиск</string>
+    <string name="text_all">Поиск</string>
 </resources>

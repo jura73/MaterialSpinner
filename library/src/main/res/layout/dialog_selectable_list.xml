@@ -25,4 +25,13 @@
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/item_list" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:id="@+id/floatingDone"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_check_white_24dp"
+        app:layout_anchor="@+id/rvAutocompleteSuggestions"
+        app:layout_anchorGravity="right|bottom"
+        app:useCompatPadding="true" />
 </android.support.design.widget.CoordinatorLayout>
