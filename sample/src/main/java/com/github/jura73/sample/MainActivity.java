@@ -34,8 +34,9 @@ public class MainActivity extends AppCompatActivity {
         listSelector2.setList(list_of_cities);
 
         materialSpinner1 = findViewById(R.id.materialSpinner1);
-
+        materialSpinner1.setList(list_of_cities);
         materialSpinner2 = findViewById(R.id.materialSpinner2);
+
         progressBar = findViewById(R.id.progressSpiner2);
         materialSpinner2.setLazyLoading(new View.OnClickListener() {
             @Override

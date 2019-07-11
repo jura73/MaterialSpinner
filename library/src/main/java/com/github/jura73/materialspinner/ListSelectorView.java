@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
@@ -18,10 +19,12 @@ import java.util.List;
 
 abstract class ListSelectorView<T> extends View {
 
-    public static final int ALPHA = 90;
+    public static final int ALPHA = 158;
 
     private boolean isShowChoiceAfterFilling;
-    protected  @Nullable List<T> mArrayList;
+
+    @Nullable
+    protected List<T> mArrayList;
     private OnClickListener mOnLazyLoading;
 
     public ListSelectorView(Context context) {
@@ -135,9 +138,9 @@ abstract class ListSelectorView<T> extends View {
         int textSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_android_textSize, scaledSizeInPixels);
         hintTextPaint.setTextSize(textSize);
         valueTextPaint.setTextSize(textSize - 1);
-        valueTextPaint.setAlpha(ALPHA);
         spaceSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_lsw_spaceSize, scaledSizeInPixels / 2);
-
+        int alphaValue = typedArrayListSelectorView.getInt(R.styleable.ListSelectorView_lsw_alpha_value, ALPHA);
+        valueTextPaint.setAlpha(alphaValue);
         setEnabled(typedArrayListSelectorView.getBoolean(R.styleable.ListSelectorView_android_enabled, true));
         typedArrayListSelectorView.recycle();
     }
@@ -150,6 +153,10 @@ abstract class ListSelectorView<T> extends View {
     public void setHint(String hint) {
         this.hint = hint;
         invalidate();
+    }
+
+    public void setAlphaValue(@IntRange(from = 0, to = 255) int alpha) {
+        valueTextPaint.setAlpha(alpha);
     }
 
     public void setColor(@ColorInt int color) {
