@@ -111,10 +111,10 @@ abstract class ListSelectorView<T> extends View {
     public ListSelectorView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         hintTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        hintTextPaint.setStyle(Paint.Style.STROKE);
+        hintTextPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
         valueTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        valueTextPaint.setStyle(Paint.Style.STROKE);
+        valueTextPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         post(new Runnable() {
             @Override
             public void run() {
