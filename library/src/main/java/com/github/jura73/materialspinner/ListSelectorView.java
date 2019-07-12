@@ -90,10 +90,10 @@ abstract class ListSelectorView<T> extends View {
         }
         return widthValueText + spaceSize;
     }
-
+    
     protected void drawText(Canvas canvas, String text, int availableWidth, TextPaint textPaint, boolean textToRight) {
         if (text != null && availableWidth > 0) {
-            int yPos = Math.round(textPaint.getFontMetrics().descent);
+            int yPos = -Math.round((textPaint.descent() + textPaint.ascent()) / 2);
             int widthValueText = Math.round(textPaint.measureText(text));
             if (widthValueText > availableWidth) {
                 CharSequence ellipsizeValueText = TextUtils.ellipsize(text, textPaint, availableWidth, TextUtils.TruncateAt.END);

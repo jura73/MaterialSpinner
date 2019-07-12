@@ -7,7 +7,7 @@
     android:padding="@dimen/activity_horizontal_margin">
 
     <com.github.jura73.materialspinner.ListMultiSelectorView
-        android:id="@+id/listSelector2"
+        android:id="@+id/listSelector"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Производитель"
