@@ -18,14 +18,14 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
     private var isShowChoiceAfterFilling: Boolean = false
 
     protected var itemList: List<T>? = null
-    private var mOnLazyLoading: View.OnClickListener? = null
+    private var mOnLazyLoading: OnClickListener? = null
 
     private var spaceSize: Int = 0
     private var hintTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-    var valueTextPaint: TextPaint
+    private var valueTextPaint: TextPaint
     private var hint: String? = null
-    var valueText: String? = null
-    var mDrawable: Drawable? = null
+    private var valueText: String? = null
+    private val mDrawable: Drawable
 
     private val widthValueTextWithSpace: Int
         get() {
@@ -36,7 +36,7 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
             return widthValueText + spaceSize
         }
 
-    fun setText(text: String?) {
+    protected fun setText(text: String?) {
         valueText = text
         invalidate()
     }
@@ -56,12 +56,12 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
         canvas.translate(paddingLeft.toFloat(), paddingTop.toFloat())
 
         val height = height - paddingTop - paddingBottom
-        val topDrawable = (height - mDrawable!!.intrinsicHeight) / 2
+        val topDrawable = (height - mDrawable.intrinsicHeight) / 2
 
-        mDrawable!!.setBounds(availableWidth - mDrawable!!.intrinsicWidth, topDrawable, availableWidth, topDrawable + mDrawable!!.intrinsicHeight)
-        mDrawable!!.draw(canvas)
+        mDrawable.setBounds(availableWidth - mDrawable.intrinsicWidth, topDrawable, availableWidth, topDrawable + mDrawable.intrinsicHeight)
+        mDrawable.draw(canvas)
 
-        availableWidth -= mDrawable!!.intrinsicWidth
+        availableWidth -= mDrawable.intrinsicWidth
 
         canvas.translate(0f, (height shr 1).toFloat())
         // Draw Label
@@ -73,7 +73,7 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
         drawText(canvas, valueText, availableWidth, valueTextPaint, true)
     }
 
-    protected fun drawText(canvas: Canvas, text: String?, availableWidth: Int, textPaint: TextPaint, textToRight: Boolean) {
+    private fun drawText(canvas: Canvas, text: String?, availableWidth: Int, textPaint: TextPaint, textToRight: Boolean) {
         if (text != null && availableWidth > 0) {
             val yPos = -Math.round((textPaint.descent() + textPaint.ascent()) / 2)
             val widthValueText = Math.round(textPaint.measureText(text))
@@ -105,10 +105,8 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
         hintTextPaint.color = textColor
         valueTextPaint.color = textColor
 
-        mDrawable = typedArrayListSelectorView.getDrawable(R.styleable.ListSelectorView_android_drawableEnd)
-        if (mDrawable == null) {
-            mDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_keyboard_arrow_right, null)
-        }
+        mDrawable = typedArrayListSelectorView.getDrawable(R.styleable.ListSelectorView_android_drawableEnd)?: ResourcesCompat.getDrawable(resources, R.drawable.ic_keyboard_arrow_right, null)!!
+
         val scaledSizeInPixels = resources.getDimensionPixelSize(R.dimen.fontSize)
         val textSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_android_textSize, scaledSizeInPixels)
         hintTextPaint.textSize = textSize.toFloat()
@@ -143,7 +141,7 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
         setInnerList(arrayList)
         if (arrayList != null) {
             if (arrayList.size == 1) {
-                setSelectionItem(arrayList[0])
+                setSelectedPosition(0)
             } else
                 showDialogAfterFillingIfNeed()
         }
@@ -162,7 +160,7 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
         restoreState()
     }
 
-    abstract fun setSelectionItem(item: T?)
+    abstract fun setSelectedPosition(positions: Int)
 
     protected open fun restoreState() {}
 
@@ -171,11 +169,9 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
         this.cleanSelected()
     }
 
-    open fun cleanSelected() {
-        setSelectionItem(null)
-    }
+    abstract fun cleanSelected()
 
-    fun setLazyLoading(onClickListener: View.OnClickListener?) {
+    fun setLazyLoading(onClickListener: OnClickListener?) {
         this.mOnLazyLoading = onClickListener
         isClickable = true
     }
@@ -196,17 +192,17 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
     protected abstract fun showSpinnerListDialog()
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val widthMode = View.MeasureSpec.getMode(widthMeasureSpec)
-        val heightMode = View.MeasureSpec.getMode(heightMeasureSpec)
-        val widthSize = View.MeasureSpec.getSize(widthMeasureSpec)
-        val heightSize = View.MeasureSpec.getSize(heightMeasureSpec)
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        val widthSize = MeasureSpec.getSize(widthMeasureSpec)
+        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
         var height = heightSize
 
-        if (heightMode != View.MeasureSpec.EXACTLY) {
+        if (heightMode != MeasureSpec.EXACTLY) {
             // Parent has told us how big to be. So be it.
             height = Math.round(hintTextPaint.textSize + hintTextPaint.fontMetrics.bottom * resources.displayMetrics.density) + paddingTop + paddingBottom
-            if (heightMode == View.MeasureSpec.AT_MOST) {
+            if (heightMode == MeasureSpec.AT_MOST) {
                 height = Math.min(height, heightSize)
             }
         }
@@ -214,7 +210,6 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
     }
 
     companion object {
-
-        val ALPHA = 158
+        const val ALPHA = 158
     }
 }

@@ -7,25 +7,11 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
-import java.util.*
 
-class ListMultiSelectorDialog<T>(context: Context, private val mItemList: List<T>, selectedItems: LinkedHashSet<T>?, private val onItemMultiSelectedListener: OnItemMultiSelectedListener<T>) :
+class ListMultiSelectorDialog<T>(context: Context, private val mItemList: List<T>, private val listSelectedPositions: MutableSet<Int>, private val onItemMultiSelectedListener: OnListSelectedPositionsListener) :
         Dialog(context, R.style.Dialog), View.OnClickListener {
 
-    private val linkedHashSet: LinkedHashSet<T>
-    private var adapter: SelectableListAdapter<T>? = null
-
     init {
-        if (selectedItems != null) {
-            this.linkedHashSet = selectedItems
-        } else {
-            linkedHashSet = LinkedHashSet()
-        }
-        setContentView(createView(context))
-        ViewHelper.setupToolbar(this, adapter!!.filter)
-    }
-
-    private fun createView(context: Context): View {
         val inflater = LayoutInflater.from(context)
         val view = inflater.inflate(R.layout.dialog_selectable_list, null)
 
@@ -33,17 +19,19 @@ class ListMultiSelectorDialog<T>(context: Context, private val mItemList: List<T
         val floatingDone = view.findViewById<FloatingActionButton>(R.id.floatingDone)
         floatingDone.setOnClickListener(this)
         recyclerView.addItemDecoration(DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL))
-        adapter = SelectableListAdapter(mItemList, linkedHashSet)
+        val adapter = SelectableListAdapter(mItemList, listSelectedPositions)
         recyclerView.adapter = adapter
         recyclerView.setOnTouchListener { _, _ ->
             ViewHelper.hideSoftInput(this@ListMultiSelectorDialog)
             false
         }
-        return view
+        setContentView(view)
+        ViewHelper.setupToolbar(this, adapter.filter)
     }
 
+
     override fun onBackPressed() {
-        onItemMultiSelectedListener.onItemsSelected(linkedHashSet, null)
+        onItemMultiSelectedListener.onItemsSelected(listSelectedPositions.toList())
         super.onBackPressed()
     }
 

@@ -27,16 +27,25 @@ class MaterialSpinner<T> : ListSelectorView<T> {
             val dialog = ListDialog(context, it, object : OnItemSelectedListener<T> {
                 override fun onItemSelected(item: T, view: View, position: Int) {
                     setSelectionItem(item)
-                    if (mOnItemSelectedListener != null) {
-                        mOnItemSelectedListener!!.onItemSelected(item, this@MaterialSpinner, position)
-                    }
+                    mOnItemSelectedListener?.onItemSelected(item, this@MaterialSpinner, position)
+
                 }
             })
             dialog.show()
         }
     }
 
-    override fun setSelectionItem(item: T?) {
+    override fun setSelectedPosition(positions: Int) {
+        itemList.let {
+            if (it != null && positions >= 0) {
+                setSelectionItem(it[positions])
+            } else {
+                setSelectionItem(null)
+            }
+        }
+    }
+
+    fun setSelectionItem(item: T?) {
         selectedItem = item
         if (item != null) {
             setText(item.toString())
@@ -46,26 +55,28 @@ class MaterialSpinner<T> : ListSelectorView<T> {
     }
 
     override fun cleanSelected() {
-        super.cleanSelected()
+        setSelectionItem(null)
         selectedItem = null
     }
 
     override fun restoreState() {
-        if (mRestorePosition != INVALID_POSITION && itemList != null && itemList!!.size > mRestorePosition) {
-            setSelectionItem(itemList!![mRestorePosition])
+        itemList?.let{
+            if (mRestorePosition != INVALID_POSITION && it.size > mRestorePosition) {
+                setSelectionItem(it[mRestorePosition])
+            }
         }
     }
 
     public override fun onSaveInstanceState(): Parcelable? {
         super.onSaveInstanceState()
         val ss = SavedState()
-
-        if (selectedItem != null && itemList != null) {
-            ss.stateToSave = itemList!!.indexOf(selectedItem!!)
-        } else {
-            ss.stateToSave = INVALID_POSITION
+        selectedItem.let {
+            if (it != null) {
+                ss.stateToSave = itemList?.indexOf(it) ?: INVALID_POSITION
+            } else {
+                ss.stateToSave = INVALID_POSITION
+            }
         }
-
         return ss
     }
 

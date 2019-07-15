@@ -10,10 +10,10 @@ import android.widget.Filter
 import android.widget.Filterable
 import java.util.*
 
-internal class SelectableListAdapter<T>(private val sourceItems: List<T>, private val linkedHashSet: LinkedHashSet<T>) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable, View.OnClickListener {
+internal class SelectableListAdapter<T>(private val sourceItems: List<T>, private val listSelectedPositions: MutableSet<Int>) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable, View.OnClickListener {
     private var mAdapterItems: List<T>? = null
     private val mFilter = object : Filter() {
-        override fun performFiltering(constraint: CharSequence): Filter.FilterResults {
+        override fun performFiltering(constraint: CharSequence): FilterResults {
             val filteredList = ArrayList<T>()
             for (initialListItem in sourceItems) {
                 if (initialListItem.toString().toLowerCase().contains(constraint.toString().toLowerCase())) {
@@ -21,12 +21,12 @@ internal class SelectableListAdapter<T>(private val sourceItems: List<T>, privat
                 }
             }
 
-            val filterResults = Filter.FilterResults()
+            val filterResults = FilterResults()
             filterResults.values = filteredList
             return filterResults
         }
 
-        override fun publishResults(constraint: CharSequence, results: Filter.FilterResults) {
+        override fun publishResults(constraint: CharSequence, results: FilterResults) {
             mAdapterItems = results.values as List<T>
             notifyDataSetChanged()
         }
@@ -52,10 +52,11 @@ internal class SelectableListAdapter<T>(private val sourceItems: List<T>, privat
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
         if (getItemViewType(position) == VIEW_TYPE_HEADER) {
-            (viewHolder as ViewHolderHeader).onBind(linkedHashSet.containsAll(sourceItems))
+            (viewHolder as ViewHolderHeader).onBind(sourceItems.size == listSelectedPositions.size)
         } else {
-            val item = mAdapterItems!![position - 1]
-            (viewHolder as ViewHolderItem<T>).onBind(item, linkedHashSet.contains(item))
+            val positionInList = position - 1
+            val item = mAdapterItems!![positionInList]
+            (viewHolder as ViewHolderItem<T>).onBind(item, positionInList, listSelectedPositions.contains(positionInList))
         }
     }
 
@@ -75,17 +76,17 @@ internal class SelectableListAdapter<T>(private val sourceItems: List<T>, privat
         if (v is CompoundButton) {
             if (v.getId() == R.id.checkboxHeader) {
                 if (v.isChecked) {
-                    linkedHashSet.addAll(sourceItems)
+                    listSelectedPositions.addAll(sourceItems.mapIndexed { index, _ -> index })
                 } else {
-                    linkedHashSet.clear()
+                    listSelectedPositions.clear()
                 }
                 notifyDataSetChanged()
             } else {
-                val itemSelected = v.getTag() as T
-                if (linkedHashSet.contains(itemSelected)) {
-                    linkedHashSet.remove(itemSelected)
+                val selectedPosition = v.getTag() as Int
+                if (listSelectedPositions.contains(selectedPosition)) {
+                    listSelectedPositions.remove(selectedPosition)
                 } else {
-                    linkedHashSet.add(itemSelected)
+                    listSelectedPositions.add(selectedPosition)
                 }
                 notifyItemChanged(0)
             }
@@ -105,16 +106,15 @@ internal class SelectableListAdapter<T>(private val sourceItems: List<T>, privat
 
         private val checkBox: AppCompatCheckBox = itemView as AppCompatCheckBox
 
-        fun onBind(item: T, isSelected: Boolean) {
-            checkBox.tag = item
+        fun onBind(item: T, position: Int, isSelected: Boolean) {
+            checkBox.tag = position
             checkBox.text = item.toString()
             checkBox.isChecked = isSelected
         }
     }
 
     companion object {
-
-        private val VIEW_TYPE_HEADER = 0
-        private val VIEW_TYPE_ITEM = 1
+        private const val VIEW_TYPE_HEADER = 0
+        private const val VIEW_TYPE_ITEM = 1
     }
 }

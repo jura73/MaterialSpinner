@@ -4,14 +4,11 @@ import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
-import android.view.View
-
-import java.util.LinkedHashSet
+import java.util.*
 
 class ListMultiSelectorView<T> : ListSelectorView<T> {
-
     private var mOnItemMultiSelectedListener: OnItemMultiSelectedListener<T>? = null
-    private var linkedHashSet: LinkedHashSet<T>? = null
+    private var selectedPositions: MutableSet<Int> = mutableSetOf()
     private var savedState: SavedState? = null
 
     constructor(context: Context) : super(context) {}
@@ -21,44 +18,55 @@ class ListMultiSelectorView<T> : ListSelectorView<T> {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {}
 
     override fun showSpinnerListDialog() {
-        itemList?.let {
-            ListMultiSelectorDialog(context, it, linkedHashSet, object : OnItemMultiSelectedListener<T> {
-                override fun onItemsSelected(items: LinkedHashSet<T>, view: View?) {
-                    setSelectionList(items)
-                    if (mOnItemMultiSelectedListener != null) {
-                        mOnItemMultiSelectedListener!!.onItemsSelected(items, this@ListMultiSelectorView)
-                    }
+        itemList?.let { list ->
+            ListMultiSelectorDialog(context, list, selectedPositions, object : OnListSelectedPositionsListener {
+                override fun onItemsSelected(items: Collection<Int>) {
+                    setSelectedPositions(items)
+                    mOnItemMultiSelectedListener?.onItemsSelected(items.map { list[it] }, this@ListMultiSelectorView)
+
                 }
-            }).show()
+            })
+                    .show()
         }
     }
 
-    override fun setSelectionItem(item: T?) {
-        val set = LinkedHashSet<T>()
-        set.add(item!!)
-        setSelectionList(set)
+    override fun setSelectedPosition(positions: Int) {
+        selectedPositions.clear()
+        selectedPositions.add(positions)
+        onSelectedChange()
+    }
+
+    override fun cleanSelected() {
+        selectedPositions.clear()
+        onSelectedChange()
+    }
+
+    private fun onSelectedChange() {
+        itemList.let {
+            if (selectedPositions.isNotEmpty() && it != null) {
+                val sb = StringBuilder()
+                var isNotFirst = false
+                for (t in selectedPositions) {
+                    if (isNotFirst) {
+                        sb.append(", ")
+                    }
+                    sb.append(it[t].toString())
+                    isNotFirst = true
+                }
+                setText(sb.toString())
+            } else {
+                setText(null)
+            }
+        }
     }
 
     fun setOnItemMultiSelectedListener(onItemMultiSelectedListener: OnItemMultiSelectedListener<T>) {
         mOnItemMultiSelectedListener = onItemMultiSelectedListener
     }
 
-    fun setSelectionList(items: LinkedHashSet<T>) {
-        linkedHashSet = items
-        if (!items.isEmpty()) {
-            val sb = StringBuilder()
-            var isNotFirst = false
-            for (t in items) {
-                if (isNotFirst) {
-                    sb.append(", ")
-                }
-                sb.append(t.toString())
-                isNotFirst = true
-            }
-            setText(sb.toString())
-        } else {
-            setText(null)
-        }
+    fun setSelectedPositions(items: Collection<Int>) {
+        selectedPositions = items.toMutableSet()
+        onSelectedChange()
     }
 
     override fun restoreState() {
@@ -70,19 +78,13 @@ class ListMultiSelectorView<T> : ListSelectorView<T> {
                 }
                 set.add(itemList!![i])
             }
-            setSelectionList(set)
+            setSelectedPositions(savedState!!.positions!!.asList())
         }
     }
 
     public override fun onSaveInstanceState(): Parcelable? {
-        if (linkedHashSet != null && itemList != null) {
-            val positions = IntArray(linkedHashSet!!.size)
-            var i = 0
-            for (t in linkedHashSet!!) {
-                positions[i] = itemList!!.indexOf(t)
-                i++
-            }
-            val savedState = SavedState(positions)
+        if (selectedPositions.isNotEmpty()) {
+            val savedState = SavedState(selectedPositions.toIntArray())
             super.onSaveInstanceState()
             return savedState
         } else {
