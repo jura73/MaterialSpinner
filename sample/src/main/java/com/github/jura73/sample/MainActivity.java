@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         final ListMultiSelectorView<String> listSelector = findViewById(R.id.listSelector);
         listSelector.setList(list_of_cities);
+        listSelector.setSelectionItem("TOTAL");
 
         materialSpinner = findViewById(R.id.materialSpinner1);
         progressBar = findViewById(R.id.progressSpiner2);
