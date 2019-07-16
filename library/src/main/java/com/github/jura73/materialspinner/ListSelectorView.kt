@@ -190,19 +190,21 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val measuredWidth = getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)
-        val widthSize = MeasureSpec.getSize(widthMeasureSpec)
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
-        var height = heightSize
-
-        if (heightMode != MeasureSpec.EXACTLY) {
-            height = (-hintTextPaint.fontMetrics.top + hintTextPaint.fontMetrics.bottom).toInt() + paddingTop + paddingBottom
-            if (heightMode == MeasureSpec.AT_MOST) {
-                height = Math.min(height, heightSize)
-            }
+        val measuredHeight = when (heightMode) {
+            MeasureSpec.EXACTLY -> heightSize
+            MeasureSpec.AT_MOST -> Math.max(getHeightSize(), suggestedMinimumHeight)
+            MeasureSpec.UNSPECIFIED -> getHeightSize()
+            else -> getHeightSize()
         }
-        setMeasuredDimension(widthSize, height)
+        setMeasuredDimension(measuredWidth, measuredHeight)
+    }
+
+    private fun getHeightSize(): Int {
+        return (-hintTextPaint.fontMetrics.top + hintTextPaint.fontMetrics.bottom).toInt() + paddingTop + paddingBottom
     }
 
     companion object {
