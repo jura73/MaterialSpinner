@@ -11,7 +11,7 @@ import android.widget.Filterable
 import java.util.*
 
 internal class SelectableListAdapter<T>(private val sourceItems: List<T>, private val listSelectedPositions: MutableSet<Int>) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable, View.OnClickListener {
-    private var mAdapterItems: List<T>? = null
+    private var mAdapterItems: List<T> = sourceItems
     private val mFilter = object : Filter() {
         override fun performFiltering(constraint: CharSequence): FilterResults {
             val filteredList = ArrayList<T>()
@@ -30,10 +30,6 @@ internal class SelectableListAdapter<T>(private val sourceItems: List<T>, privat
             mAdapterItems = results.values as List<T>
             notifyDataSetChanged()
         }
-    }
-
-    init {
-        mAdapterItems = sourceItems
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -55,7 +51,7 @@ internal class SelectableListAdapter<T>(private val sourceItems: List<T>, privat
             (viewHolder as ViewHolderHeader).onBind(sourceItems.size == listSelectedPositions.size)
         } else {
             val positionInList = position - 1
-            val item = mAdapterItems!![positionInList]
+            val item = mAdapterItems[positionInList]
             (viewHolder as ViewHolderItem<T>).onBind(item, positionInList, listSelectedPositions.contains(positionInList))
         }
     }
@@ -65,7 +61,7 @@ internal class SelectableListAdapter<T>(private val sourceItems: List<T>, privat
     }
 
     override fun getItemCount(): Int {
-        return mAdapterItems!!.size + 1
+        return mAdapterItems.size + 1
     }
 
     override fun getFilter(): Filter {

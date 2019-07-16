@@ -24,14 +24,12 @@ class MaterialSpinner<T> : ListSelectorView<T> {
 
     override fun showSpinnerListDialog() {
         itemList?.let {
-            val dialog = ListDialog(context, it, object : OnItemSelectedListener<T> {
+            ListDialog(context, it, object : OnItemSelectedListener<T> {
                 override fun onItemSelected(item: T, view: View, position: Int) {
                     setSelectionItem(item)
                     mOnItemSelectedListener?.onItemSelected(item, this@MaterialSpinner, position)
-
                 }
-            })
-            dialog.show()
+            }).show()
         }
     }
 
@@ -47,20 +45,15 @@ class MaterialSpinner<T> : ListSelectorView<T> {
 
     fun setSelectionItem(item: T?) {
         selectedItem = item
-        if (item != null) {
-            setText(item.toString())
-        } else {
-            setText(null)
-        }
+        setText(item?.toString())
     }
 
     override fun cleanSelected() {
         setSelectionItem(null)
-        selectedItem = null
     }
 
     override fun restoreState() {
-        itemList?.let{
+        itemList?.let {
             if (mRestorePosition != INVALID_POSITION && it.size > mRestorePosition) {
                 setSelectionItem(it[mRestorePosition])
             }

@@ -27,69 +27,6 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
     private var valueText: String? = null
     private val mDrawable: Drawable
 
-    private val widthValueTextWithSpace: Int
-        get() {
-            var widthValueText = 0
-            if (hint != null) {
-                widthValueText = Math.round(hintTextPaint.measureText(hint))
-            }
-            return widthValueText + spaceSize
-        }
-
-    protected fun setText(text: String?) {
-        valueText = text
-        invalidate()
-    }
-
-    override fun setEnabled(enabled: Boolean) {
-        if (enabled == isEnabled) return
-        if (enabled) {
-            setAlpha(1f)
-        } else {
-            setAlpha(0.2f)
-        }
-        super.setEnabled(enabled)
-    }
-
-    override fun onDraw(canvas: Canvas) {
-        var availableWidth = width - paddingRight - paddingLeft
-        canvas.translate(paddingLeft.toFloat(), paddingTop.toFloat())
-
-        val height = height - paddingTop - paddingBottom
-        val topDrawable = (height - mDrawable.intrinsicHeight) / 2
-
-        mDrawable.setBounds(availableWidth - mDrawable.intrinsicWidth, topDrawable, availableWidth, topDrawable + mDrawable.intrinsicHeight)
-        mDrawable.draw(canvas)
-
-        availableWidth -= mDrawable.intrinsicWidth
-
-        canvas.translate(0f, (height shr 1).toFloat())
-        // Draw Label
-        drawText(canvas, hint, availableWidth, hintTextPaint, false)
-        val widthValueTextWithSpace = widthValueTextWithSpace
-        canvas.translate(widthValueTextWithSpace.toFloat(), 0f)
-        availableWidth -= widthValueTextWithSpace
-        // Draw Value
-        drawText(canvas, valueText, availableWidth, valueTextPaint, true)
-    }
-
-    private fun drawText(canvas: Canvas, text: String?, availableWidth: Int, textPaint: TextPaint, textToRight: Boolean) {
-        if (text != null && availableWidth > 0) {
-            val yPos = -Math.round((textPaint.descent() + textPaint.ascent()) / 2)
-            val widthValueText = Math.round(textPaint.measureText(text))
-            if (widthValueText > availableWidth) {
-                val ellipsizeValueText = TextUtils.ellipsize(text, textPaint, availableWidth.toFloat(), TextUtils.TruncateAt.END)
-                canvas.drawText(ellipsizeValueText.toString(), 0f, yPos.toFloat(), textPaint)
-            } else {
-                var xPos = 0
-                if (textToRight) {
-                    xPos = availableWidth - widthValueText
-                }
-                canvas.drawText(text, xPos.toFloat(), yPos.toFloat(), textPaint)
-            }
-        }
-    }
-
     init {
         hintTextPaint.style = Paint.Style.FILL_AND_STROKE
 
@@ -105,7 +42,8 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
         hintTextPaint.color = textColor
         valueTextPaint.color = textColor
 
-        mDrawable = typedArrayListSelectorView.getDrawable(R.styleable.ListSelectorView_android_drawableEnd)?: ResourcesCompat.getDrawable(resources, R.drawable.ic_keyboard_arrow_right, null)!!
+        mDrawable = typedArrayListSelectorView.getDrawable(R.styleable.ListSelectorView_android_drawableEnd)
+                ?: ResourcesCompat.getDrawable(resources, R.drawable.ic_keyboard_arrow_right, null)!!
 
         val scaledSizeInPixels = resources.getDimensionPixelSize(R.dimen.fontSize)
         val textSize = typedArrayListSelectorView.getDimensionPixelSize(R.styleable.ListSelectorView_android_textSize, scaledSizeInPixels)
@@ -116,6 +54,23 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
         valueTextPaint.alpha = alphaValue
         isEnabled = typedArrayListSelectorView.getBoolean(R.styleable.ListSelectorView_android_enabled, true)
         typedArrayListSelectorView.recycle()
+    }
+
+    protected abstract fun showSpinnerListDialog()
+
+    protected fun setText(text: String?) {
+        valueText = text
+        invalidate()
+    }
+
+    override fun setEnabled(enabled: Boolean) {
+        if (enabled == isEnabled) return
+        if (enabled) {
+            setAlpha(1f)
+        } else {
+            setAlpha(0.3f)
+        }
+        super.setEnabled(enabled)
     }
 
     fun setList(arrayList: List<T>?) {
@@ -180,16 +135,62 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
         if (this.itemList != null) {
             this.showSpinnerListDialog()
         } else {
-            val lazyLoading = this.mOnLazyLoading
-            if (lazyLoading != null) {
+            mOnLazyLoading?.let {
                 this.isShowChoiceAfterFilling = true
-                lazyLoading.onClick(this)
+                it.onClick(this)
             }
         }
         return super.performClick()
     }
 
-    protected abstract fun showSpinnerListDialog()
+    private fun widthValueTextWithSpace(): Int {
+        hint.let {
+            return if (it != null) {
+                Math.round(hintTextPaint.measureText(hint)) + spaceSize
+            } else {
+                spaceSize
+            }
+        }
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        var availableWidth = width - paddingRight - paddingLeft
+        canvas.translate(paddingLeft.toFloat(), paddingTop.toFloat())
+
+        val height = height - paddingTop - paddingBottom
+        val topDrawable = (height - mDrawable.intrinsicHeight) / 2
+
+        mDrawable.setBounds(availableWidth - mDrawable.intrinsicWidth, topDrawable, availableWidth, topDrawable + mDrawable.intrinsicHeight)
+        mDrawable.draw(canvas)
+
+        availableWidth -= mDrawable.intrinsicWidth
+
+        canvas.translate(0f, (height shr 1).toFloat())
+        // Draw Label
+        drawText(canvas, hint, availableWidth, hintTextPaint, false)
+        val widthValueTextWithSpace = widthValueTextWithSpace()
+        canvas.translate(widthValueTextWithSpace.toFloat(), 0f)
+        availableWidth -= widthValueTextWithSpace
+        // Draw Value
+        drawText(canvas, valueText, availableWidth, valueTextPaint, true)
+    }
+
+    private fun drawText(canvas: Canvas, text: String?, availableWidth: Int, textPaint: TextPaint, textToRight: Boolean) {
+        if (text != null && availableWidth > 0) {
+            val yPos = -Math.round((textPaint.descent() + textPaint.ascent()) / 2)
+            val widthValueText = Math.round(textPaint.measureText(text))
+            if (widthValueText > availableWidth) {
+                val ellipsizeValueText = TextUtils.ellipsize(text, textPaint, availableWidth.toFloat(), TextUtils.TruncateAt.END)
+                canvas.drawText(ellipsizeValueText.toString(), 0f, yPos.toFloat(), textPaint)
+            } else {
+                var xPos = 0
+                if (textToRight) {
+                    xPos = availableWidth - widthValueText
+                }
+                canvas.drawText(text, xPos.toFloat(), yPos.toFloat(), textPaint)
+            }
+        }
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)

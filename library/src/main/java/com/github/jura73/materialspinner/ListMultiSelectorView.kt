@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
-import java.util.*
 
 class ListMultiSelectorView<T> : ListSelectorView<T> {
     private var mOnItemMultiSelectedListener: OnItemMultiSelectedListener<T>? = null
@@ -23,10 +22,8 @@ class ListMultiSelectorView<T> : ListSelectorView<T> {
                 override fun onItemsSelected(items: Collection<Int>) {
                     setSelectedPositions(items)
                     mOnItemMultiSelectedListener?.onItemsSelected(items.map { list[it] }, this@ListMultiSelectorView)
-
                 }
-            })
-                    .show()
+            }).show()
         }
     }
 
@@ -70,15 +67,8 @@ class ListMultiSelectorView<T> : ListSelectorView<T> {
     }
 
     override fun restoreState() {
-        if (savedState != null && savedState!!.positions != null && itemList != null) {
-            val set = LinkedHashSet<T>()
-            for (i in savedState!!.positions!!) {
-                if (i >= itemList!!.size && i > 0) {
-                    return  // List was change
-                }
-                set.add(itemList!![i])
-            }
-            setSelectedPositions(savedState!!.positions!!.asList())
+        savedState?.positions?.let { savedPositions ->
+            setSelectedPositions(savedPositions.asList())
         }
     }
 
