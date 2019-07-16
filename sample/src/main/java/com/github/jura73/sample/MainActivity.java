@@ -30,8 +30,9 @@ public class MainActivity extends AppCompatActivity {
         String[] stringArray = getResources().getStringArray(R.array.list_of_cities_in_Italy);
         list_of_cities = Arrays.asList(stringArray);
 
-        final ListMultiSelectorView<String> listSelector2 = findViewById(R.id.listSelector2);
-        listSelector2.setList(list_of_cities);
+        final ListMultiSelectorView<String> listSelector = findViewById(R.id.listSelector);
+        listSelector.setList(list_of_cities);
+        listSelector.setSelectedPosition(0);
 
         materialSpinner = findViewById(R.id.materialSpinner1);
         progressBar = findViewById(R.id.progressSpiner2);
