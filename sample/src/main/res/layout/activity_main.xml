@@ -24,7 +24,7 @@
             android:layout_centerInParent="true"
             android:layout_toStartOf="@+id/buttonClear"
             android:entries="@array/list_of_cities_in_Italy"
-            android:hint="cities in Italy" />
+            android:hint="Cities in Italy" />
 
         <ImageView
             android:id="@+id/buttonClear"
@@ -47,13 +47,13 @@
         android:id="@+id/materialSpinner2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="cities in Italy" />
+        android:hint="Cities in Italy" />
 
     <com.github.jura73.materialspinner.MaterialSpinner
         android:id="@+id/materialSpinner3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="cities in Italy" />
+        android:hint="Cities in Italy" />
 
     <com.github.jura73.materialspinner.MaterialSpinner
         android:id="@+id/materialSpinner4"
