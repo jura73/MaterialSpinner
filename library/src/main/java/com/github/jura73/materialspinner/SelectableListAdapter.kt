@@ -10,11 +10,11 @@ import android.widget.Filter
 import android.widget.Filterable
 import java.util.*
 
-internal class SelectableListAdapter<T>(private val sourceItems: List<T>, private val listSelectedPositions: MutableSet<Int>) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable, View.OnClickListener {
-    private var mAdapterItems: List<T> = sourceItems
+internal class SelectableListAdapter(private val sourceItems: List<SelectableWrapper<*>>) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable, View.OnClickListener {
+    private var mAdapterItems: List<SelectableWrapper<*>> = sourceItems
     private val mFilter = object : Filter() {
         override fun performFiltering(constraint: CharSequence): FilterResults {
-            val filteredList = ArrayList<T>()
+            val filteredList = ArrayList<SelectableWrapper<*>>()
             for (initialListItem in sourceItems) {
                 if (initialListItem.toString().toLowerCase().contains(constraint.toString().toLowerCase())) {
                     filteredList.add(initialListItem)
@@ -27,7 +27,7 @@ internal class SelectableListAdapter<T>(private val sourceItems: List<T>, privat
         }
 
         override fun publishResults(constraint: CharSequence, results: FilterResults) {
-            mAdapterItems = results.values as List<T>
+            mAdapterItems = results.values as List<SelectableWrapper<*>>
             notifyDataSetChanged()
         }
     }
@@ -42,17 +42,17 @@ internal class SelectableListAdapter<T>(private val sourceItems: List<T>, privat
             val itemView = LayoutInflater.from(parent.context)
                     .inflate(R.layout.selectable_item_list, parent, false)
             itemView.setOnClickListener(this)
-            return ViewHolderItem<T>(itemView)
+            return ViewHolderItem(itemView)
         }
     }
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
         if (getItemViewType(position) == VIEW_TYPE_HEADER) {
-            (viewHolder as ViewHolderHeader).onBind(sourceItems.size == listSelectedPositions.size)
+            (viewHolder as ViewHolderHeader).onBind(sourceItems.all { it.isSelected })
         } else {
             val positionInList = position - 1
             val item = mAdapterItems[positionInList]
-            (viewHolder as ViewHolderItem<T>).onBind(item, positionInList, listSelectedPositions.contains(positionInList))
+            (viewHolder as ViewHolderItem).onBind(item)
         }
     }
 
@@ -71,19 +71,11 @@ internal class SelectableListAdapter<T>(private val sourceItems: List<T>, privat
     override fun onClick(v: View) {
         if (v is CompoundButton) {
             if (v.getId() == R.id.checkboxHeader) {
-                if (v.isChecked) {
-                    listSelectedPositions.addAll(sourceItems.mapIndexed { index, _ -> index })
-                } else {
-                    listSelectedPositions.clear()
-                }
+                sourceItems.forEach { it.isSelected = v.isChecked }
                 notifyDataSetChanged()
             } else {
-                val selectedPosition = v.getTag() as Int
-                if (listSelectedPositions.contains(selectedPosition)) {
-                    listSelectedPositions.remove(selectedPosition)
-                } else {
-                    listSelectedPositions.add(selectedPosition)
-                }
+                val selectedPosition = v.getTag() as SelectableWrapper<*>
+                selectedPosition.isSelected = v.isChecked
                 notifyItemChanged(0)
             }
         }
@@ -98,14 +90,14 @@ internal class SelectableListAdapter<T>(private val sourceItems: List<T>, privat
         }
     }
 
-    internal class ViewHolderItem<T>(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class ViewHolderItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val checkBox: AppCompatCheckBox = itemView as AppCompatCheckBox
 
-        fun onBind(item: T, position: Int, isSelected: Boolean) {
-            checkBox.tag = position
+        fun onBind(item: SelectableWrapper<*>) {
+            checkBox.tag = item
             checkBox.text = item.toString()
-            checkBox.isChecked = isSelected
+            checkBox.isChecked = item.isSelected
         }
     }
 
