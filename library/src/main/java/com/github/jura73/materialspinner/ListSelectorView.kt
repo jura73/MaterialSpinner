@@ -13,7 +13,7 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.View
 
-abstract class ListSelectorView<T> constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
+abstract class ListSelectorView<T> constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.materialSpinnerStyle)
     : View(context, attrs, defStyleAttr) {
 
     private var isShowChoiceAfterFilling: Boolean = false

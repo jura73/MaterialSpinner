@@ -5,13 +5,11 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
 
-class ListMultiSelectorView<T> : ListSelectorView<SelectableWrapper<T>> {
+class MultipleSelectionSpinner<T> : ListSelectorView<SelectableWrapper<T>> {
     private var mOnItemMultiSelectedListener: OnItemMultiSelectedListener<T>? = null
     private var savedState: SavedState? = null
 
-    constructor(context: Context) : super(context) {}
-
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {}
+    constructor(context: Context, attrs: AttributeSet? = null) : super(context, attrs)
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {}
 
@@ -20,7 +18,7 @@ class ListMultiSelectorView<T> : ListSelectorView<SelectableWrapper<T>> {
             ListMultiSelectorDialog<T>(context, list, object : OnListSelectedPositionsListener {
                 override fun onItemsSelectedChanged() {
                     onSelectedChange()
-                    mOnItemMultiSelectedListener?.onItemsSelected(itemList?.filter { it.isSelected }?.map { it.item }, this@ListMultiSelectorView)
+                    mOnItemMultiSelectedListener?.onItemsSelected(itemList?.filter { it.isSelected }?.map { it.item }, this@MultipleSelectionSpinner)
                 }
             }).show()
         }

@@ -2,4 +2,8 @@
 <resources>
 
     <style name="Dialog" />
+
+    <style name="materialSpinnerStyle">
+        <item name="android:background">@drawable/spinner_background_material</item>
+    </style>
 </resources>

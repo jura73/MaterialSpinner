@@ -12,11 +12,9 @@ class MaterialSpinner<T> : ListSelectorView<T> {
     var selectedItem: T? = null
         private set
 
-    constructor(context: Context) : super(context) {}
+    constructor(context: Context, attrs: AttributeSet? = null) : super(context, attrs)
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {}
-
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {}
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     fun setOnItemSelectedListener(onItemSelectedListener: OnItemSelectedListener<T>) {
         mOnItemSelectedListener = onItemSelectedListener
