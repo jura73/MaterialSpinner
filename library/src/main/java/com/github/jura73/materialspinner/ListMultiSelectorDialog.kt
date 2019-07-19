@@ -8,7 +8,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 
-class ListMultiSelectorDialog<T>(context: Context, private val mItemList: List<T>, private val listSelectedPositions: MutableSet<Int>, private val onItemMultiSelectedListener: OnListSelectedPositionsListener) :
+class ListMultiSelectorDialog<T>(context: Context, mItemList: List<SelectableWrapper<*>>, private val onItemMultiSelectedListener: OnListSelectedPositionsListener) :
         Dialog(context, R.style.Dialog), View.OnClickListener {
 
     init {
@@ -19,7 +19,7 @@ class ListMultiSelectorDialog<T>(context: Context, private val mItemList: List<T
         val floatingDone = view.findViewById<FloatingActionButton>(R.id.floatingDone)
         floatingDone.setOnClickListener(this)
         recyclerView.addItemDecoration(DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL))
-        val adapter = SelectableListAdapter(mItemList, listSelectedPositions)
+        val adapter = SelectableListAdapter(mItemList.sortedByDescending { it.isSelected })
         recyclerView.adapter = adapter
         recyclerView.setOnTouchListener { _, _ ->
             ViewHelper.hideSoftInput(this@ListMultiSelectorDialog)
@@ -31,7 +31,7 @@ class ListMultiSelectorDialog<T>(context: Context, private val mItemList: List<T
 
 
     override fun onBackPressed() {
-        onItemMultiSelectedListener.onItemsSelected(listSelectedPositions.toList())
+        onItemMultiSelectedListener.onItemsSelectedChanged()
         super.onBackPressed()
     }
 

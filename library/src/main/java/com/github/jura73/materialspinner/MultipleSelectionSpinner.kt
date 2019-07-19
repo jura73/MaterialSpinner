@@ -5,56 +5,41 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
 
-class ListMultiSelectorView<T> : ListSelectorView<T> {
+class MultipleSelectionSpinner<T> : ListSelectorView<SelectableWrapper<T>> {
     private var mOnItemMultiSelectedListener: OnItemMultiSelectedListener<T>? = null
-    private var selectedPositions: MutableSet<Int> = mutableSetOf()
     private var savedState: SavedState? = null
 
-    constructor(context: Context) : super(context) {}
-
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {}
+    constructor(context: Context, attrs: AttributeSet? = null) : super(context, attrs)
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {}
 
     override fun showSpinnerListDialog() {
         itemList?.let { list ->
-            ListMultiSelectorDialog(context, list, selectedPositions, object : OnListSelectedPositionsListener {
-                override fun onItemsSelected(items: Collection<Int>) {
-                    setSelectedPositions(items)
-                    mOnItemMultiSelectedListener?.onItemsSelected(items.map { list[it] }, this@ListMultiSelectorView)
+            ListMultiSelectorDialog<T>(context, list, object : OnListSelectedPositionsListener {
+                override fun onItemsSelectedChanged() {
+                    onSelectedChange()
+                    mOnItemMultiSelectedListener?.onItemsSelected(itemList?.filter { it.isSelected }?.map { it.item }, this@MultipleSelectionSpinner)
                 }
             }).show()
         }
     }
 
+    fun setList(arrayList: Collection<T>) {
+        setList(arrayList.map { SelectableWrapper(it) })
+    }
+
     override fun setSelectedPosition(positions: Int) {
-        selectedPositions.clear()
-        selectedPositions.add(positions)
+        itemList?.get(positions)?.isSelected = true
         onSelectedChange()
     }
 
     override fun cleanSelected() {
-        selectedPositions.clear()
+        itemList?.forEach { it.isSelected = false }
         onSelectedChange()
     }
 
     private fun onSelectedChange() {
-        itemList.let {
-            if (selectedPositions.isNotEmpty() && it != null) {
-                val sb = StringBuilder()
-                var isNotFirst = false
-                for (t in selectedPositions) {
-                    if (isNotFirst) {
-                        sb.append(", ")
-                    }
-                    sb.append(it[t].toString())
-                    isNotFirst = true
-                }
-                setText(sb.toString())
-            } else {
-                setText(null)
-            }
-        }
+        setText(itemList?.filter { it.isSelected }?.joinToString())
     }
 
     fun setOnItemMultiSelectedListener(onItemMultiSelectedListener: OnItemMultiSelectedListener<T>) {
@@ -62,7 +47,7 @@ class ListMultiSelectorView<T> : ListSelectorView<T> {
     }
 
     fun setSelectedPositions(items: Collection<Int>) {
-        selectedPositions = items.toMutableSet()
+        items.forEach { itemList?.get(it)?.isSelected = true }
         onSelectedChange()
     }
 
@@ -73,7 +58,8 @@ class ListMultiSelectorView<T> : ListSelectorView<T> {
     }
 
     public override fun onSaveInstanceState(): Parcelable? {
-        if (selectedPositions.isNotEmpty()) {
+        val selectedPositions = itemList?.filter { it.isSelected }?.mapIndexed { index, _ -> index }
+        if (selectedPositions?.isNotEmpty() == true) {
             val savedState = SavedState(selectedPositions.toIntArray())
             super.onSaveInstanceState()
             return savedState

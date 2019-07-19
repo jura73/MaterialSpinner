@@ -2,6 +2,7 @@ package com.github.jura73.materialspinner
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.support.annotation.ColorInt
@@ -12,7 +13,7 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.View
 
-abstract class ListSelectorView<T> constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
+abstract class ListSelectorView<T> constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.materialSpinnerStyle)
     : View(context, attrs, defStyleAttr) {
 
     private var isShowChoiceAfterFilling: Boolean = false
@@ -22,23 +23,21 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
 
     private var spaceSize: Int = 0
     private var hintTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-    private var valueTextPaint: TextPaint
+    private var valueTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
     private var hint: String? = null
     private var valueText: String? = null
     private val mDrawable: Drawable
 
     init {
         hintTextPaint.style = Paint.Style.FILL_AND_STROKE
-
-        valueTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
         valueTextPaint.style = Paint.Style.FILL_AND_STROKE
+
         post { restoreState() }
 
         val typedArrayListSelectorView = context.obtainStyledAttributes(attrs, R.styleable.ListSelectorView)
-
         hint = typedArrayListSelectorView.getString(R.styleable.ListSelectorView_android_hint)
         valueText = typedArrayListSelectorView.getString(R.styleable.ListSelectorView_lsw_value)
-        val textColor = typedArrayListSelectorView.getColor(R.styleable.ListSelectorView_android_textColor, getContext().resources.getColor(R.color.primary_text))
+        val textColor = typedArrayListSelectorView.getColor(R.styleable.ListSelectorView_android_textColor, Color.BLACK)
         hintTextPaint.color = textColor
         valueTextPaint.color = textColor
 
@@ -55,8 +54,6 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
         isEnabled = typedArrayListSelectorView.getBoolean(R.styleable.ListSelectorView_android_enabled, true)
         typedArrayListSelectorView.recycle()
     }
-
-    protected abstract fun showSpinnerListDialog()
 
     protected fun setText(text: String?) {
         valueText = text
@@ -120,8 +117,8 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
     protected open fun restoreState() {}
 
     fun clear() {
-        this.itemList = null
-        this.cleanSelected()
+        itemList = null
+        cleanSelected()
     }
 
     abstract fun cleanSelected()
@@ -132,26 +129,18 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
     }
 
     override fun performClick(): Boolean {
-        if (this.itemList != null) {
-            this.showSpinnerListDialog()
+        if (itemList != null) {
+            showSpinnerListDialog()
         } else {
             mOnLazyLoading?.let {
-                this.isShowChoiceAfterFilling = true
+                isShowChoiceAfterFilling = true
                 it.onClick(this)
             }
         }
         return super.performClick()
     }
 
-    private fun widthValueTextWithSpace(): Int {
-        hint.let {
-            return if (it != null) {
-                Math.round(hintTextPaint.measureText(hint)) + spaceSize
-            } else {
-                spaceSize
-            }
-        }
-    }
+    protected abstract fun showSpinnerListDialog()
 
     override fun onDraw(canvas: Canvas) {
         var availableWidth = width - paddingRight - paddingLeft
@@ -168,11 +157,19 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
         canvas.translate(0f, (height shr 1).toFloat())
         // Draw Label
         drawText(canvas, hint, availableWidth, hintTextPaint, false)
-        val widthValueTextWithSpace = widthValueTextWithSpace()
+        val widthValueTextWithSpace = getWidthValueTextWithSpace()
         canvas.translate(widthValueTextWithSpace.toFloat(), 0f)
         availableWidth -= widthValueTextWithSpace
         // Draw Value
         drawText(canvas, valueText, availableWidth, valueTextPaint, true)
+    }
+
+    private fun getWidthValueTextWithSpace(): Int {
+        var widthValueText = 0
+        if (hint != null) {
+            widthValueText = Math.round(hintTextPaint.measureText(hint))
+        }
+        return widthValueText + spaceSize
     }
 
     private fun drawText(canvas: Canvas, text: String?, availableWidth: Int, textPaint: TextPaint, textToRight: Boolean) {
@@ -193,21 +190,21 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val measuredWidth = getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)
-        val widthSize = MeasureSpec.getSize(widthMeasureSpec)
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
-        var height = heightSize
-
-        if (heightMode != MeasureSpec.EXACTLY) {
-            // Parent has told us how big to be. So be it.
-            height = Math.round(hintTextPaint.textSize + hintTextPaint.fontMetrics.bottom * resources.displayMetrics.density) + paddingTop + paddingBottom
-            if (heightMode == MeasureSpec.AT_MOST) {
-                height = Math.min(height, heightSize)
-            }
+        val measuredHeight = when (heightMode) {
+            MeasureSpec.EXACTLY -> heightSize
+            MeasureSpec.AT_MOST -> Math.max(getHeightSize(), suggestedMinimumHeight)
+            MeasureSpec.UNSPECIFIED -> getHeightSize()
+            else -> getHeightSize()
         }
-        setMeasuredDimension(widthSize, height)
+        setMeasuredDimension(measuredWidth, measuredHeight)
+    }
+
+    private fun getHeightSize(): Int {
+        return (-hintTextPaint.fontMetrics.top + hintTextPaint.fontMetrics.bottom).toInt() + paddingTop + paddingBottom
     }
 
     companion object {
