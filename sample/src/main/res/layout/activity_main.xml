@@ -6,13 +6,18 @@
     android:orientation="vertical"
     android:padding="@dimen/activity_horizontal_margin">
 
-    <com.github.jura73.materialspinner.MultipleSelectionSpinner
-        android:id="@+id/listSelector"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:hint="Производитель"
-        android:textColor="#000" />
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.github.jura73.materialspinner.MultipleSelectionSpinner
+            android:id="@+id/listSelector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Cities in Italy"
+            android:minHeight="48dp"
+            android:textColor="#000" />
+    </android.support.v4.widget.NestedScrollView>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -20,12 +25,13 @@
 
         <com.github.jura73.materialspinner.MaterialSpinner
             android:id="@+id/materialSpinner1"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_toStartOf="@+id/buttonClear"
             android:entries="@array/list_of_cities_in_Italy"
-            android:hint="Cities in Italy" />
+            android:hint="Cities in Italy"
+            android:minHeight="48dp" />
 
         <ImageView
             android:id="@+id/buttonClear"

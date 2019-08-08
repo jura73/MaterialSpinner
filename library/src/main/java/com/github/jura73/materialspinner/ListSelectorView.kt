@@ -196,9 +196,7 @@ abstract class ListSelectorView<T> constructor(context: Context, attrs: Attribut
 
         val measuredHeight = when (heightMode) {
             MeasureSpec.EXACTLY -> heightSize
-            MeasureSpec.AT_MOST -> Math.max(getHeightSize(), suggestedMinimumHeight)
-            MeasureSpec.UNSPECIFIED -> getHeightSize()
-            else -> getHeightSize()
+            else -> Math.max(getHeightSize(), suggestedMinimumHeight)
         }
         setMeasuredDimension(measuredWidth, measuredHeight)
     }
